@@ -182,8 +182,10 @@ class CryptoPlugin : MethodCallHandler {
                     }
                     "verifySign" -> {
                         val text = arguments[0] as String
-                        val result = pgp.verifySign(text)
-                        return listOf(result.first, result.second)
+                        return pgp.verifySign(text)
+                    }
+                    "verifyResult" -> {
+                        return listOf(pgp.verifyResult())
                     }
                 }
             }

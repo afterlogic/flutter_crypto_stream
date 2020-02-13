@@ -77,46 +77,46 @@ class PgpApiTest {
 
         var messageEncrypted = pgpHelper.encryptBytes(message, password)
         var messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
+        assert(pgpHelper.verifyResult() == true)
         assert(String(messageDecrypted) == String(message))
 
         messageEncrypted = pgpHelper.encryptBytes(message, password)
         messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
+        assert(pgpHelper.verifyResult() == true)
         assert(String(messageDecrypted) == String(message))
 
         messageEncrypted = pgpHelper.encryptBytes(message, password)
         messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
+        assert(pgpHelper.verifyResult() == true)
         assert(String(messageDecrypted) == String(message))
 
-        try {
-            messageEncrypted = pgpHelper.encryptBytes(message, password)
-            pgpHelper.setPublicKeys(listOf(otherPublicKey))
-            pgpHelper.decryptBytes(messageEncrypted, password)
-            throw Throwable("failed check Sign")
-        } catch (e: SignError) {
-        }
 
+        messageEncrypted = pgpHelper.encryptBytes(message, password)
+        pgpHelper.setPublicKeys(listOf(otherPublicKey))
+        pgpHelper.decryptBytes(messageEncrypted, password)
+        assert(pgpHelper.verifyResult() == false)
+
+        pgpHelper.setPublicKeys(listOf(publicKey))
         try {
-            pgpHelper.setPublicKeys(listOf(publicKey))
-            messageEncrypted = pgpHelper.encryptBytes(message, password + "1")
-            pgpHelper.decryptBytes(messageEncrypted, password)
-            throw Throwable("failed check Sign")
-        } catch (e: InputDataError) {
-            e
+            pgpHelper.encryptBytes(message, password + "1")
+        } catch (e: Throwable) {
+            assert(e is InputDataError)
         }
     }
 
     @Test
     fun testPrimarySign() {
         val message = "message asd adasdasd"
+        val pgp = Pgp()
+        val signed = pgp.addSignature(message, privateKey, password)
 
-        val signed = Pgp().addSignature(message, privateKey, password)
 
-
-        var verify = Pgp().verifySignature(signed, listOf(otherPublicKey))
-        assert(!verify.first)
-        verify = Pgp().verifySignature(signed, listOf(publicKey))
-        assert(verify.first)
-        assert(verify.second==message)
+        var verify = pgp.verifySignature(signed, listOf(otherPublicKey))
+        assert(pgp.lastVerifyResult == false)
+        assert(verify == message)
+        verify = pgp.verifySignature(signed, listOf(publicKey))
+        assert(pgp.lastVerifyResult == true)
+        assert(verify == message)
     }
 
     @Test

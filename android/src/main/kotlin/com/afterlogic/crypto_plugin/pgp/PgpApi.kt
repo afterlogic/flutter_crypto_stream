@@ -45,12 +45,12 @@ open class PgpApi {
         pgp.decrypt(inputStream, outputStream, privateKey, password, length, publicKey)
     }
 
+
     fun decryptBytes(array: ByteArray, password: String?): ByteArray {
         val outStream = ByteArrayOutputStream()
         decrypt(ByteArrayInputStream(array), outStream, password, array.size.toLong())
         return outStream.toByteArray()
     }
-
 
     fun decryptFile(inputFilePath: String, outputFilePath: String, password: String?) {
         val inputFile = File(inputFilePath)
@@ -159,8 +159,12 @@ open class PgpApi {
         return pgp.addSignature(text, privateKey!!, password)
     }
 
-    fun verifySign(text: String): Pair<Boolean, String> {
+    fun verifySign(text: String): String {
         assert(publicKey != null)
         return pgp.verifySignature(text, publicKey!!)
+    }
+
+    fun verifyResult(): Boolean? {
+        return pgp.lastVerifyResult
     }
 }

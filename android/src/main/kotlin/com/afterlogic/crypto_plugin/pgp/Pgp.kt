@@ -40,6 +40,8 @@ class Pgp {
     private val digestCalculator = BcPGPDigestCalculatorProvider()
     private val provider = BouncyCastleProvider()
     private val calculator: KeyFingerPrintCalculator = BcKeyFingerprintCalculator()
+    var lastVerifyResult: Boolean? = null
+        private set
     var progress: Progress? = null
         private set
 
@@ -83,6 +85,7 @@ class Pgp {
 
     @Throws(Exception::class)
     fun decrypt(inputStream: InputStream, output: OutputStream, privateKey: String?, password: String?, fileLength: Long, publicKey: List<String>?) {
+        lastVerifyResult = true
         this.progress?.stop = true
         val progress = Progress()
         this.progress = progress
@@ -114,7 +117,8 @@ class Pgp {
                             builder
                                     .verifyWith(pgpPub)
                                     .handleMissingPublicKeysWith {
-                                        throw SignError()
+                                        lastVerifyResult = false
+                                        null
                                     }
                         } else {
                             builder.doNotVerify()
@@ -167,11 +171,9 @@ class Pgp {
                         if (publicKeys != null) {
                             val encKey = publicKeys.map { key ->
                                 readPublicKey(ByteArrayInputStream(key.toByteArray()))
-
                             }
 
-                            it
-                                    .toRecipients(*encKey.toTypedArray())
+                            it.toRecipients(*encKey.toTypedArray())
                                     .usingAlgorithms(
                                             SymmetricKeyAlgorithm.AES_256,
                                             HashAlgorithm.SHA512,
@@ -481,9 +483,9 @@ class Pgp {
                 String(signature)
     }
 
-    fun verifySignature(text: String, publicKeys: List<String>): Pair<Boolean, String> {
+    fun verifySignature(text: String, publicKeys: List<String>): String {
 
-
+        lastVerifyResult = false
         val startMessage = text.indexOf(PGP_SIGN_TITLE)
                 .let {
                     text.indexOf("\n", startIndex = it + PGP_SIGN_TITLE.length + 4)
@@ -491,10 +493,10 @@ class Pgp {
 
         val startSignature = text.indexOf(BEGIN_SIGNATURE)
         if (startSignature < 0)
-            return false to ""
+            return ""
         val endSignature = text.indexOf(END_SIGNATURE).let {
             if (it < 0)
-                return false to ""
+                return ""
             it + END_SIGNATURE.length
         }
         val signedData = text.substring(startMessage, startSignature - 2)
@@ -509,7 +511,7 @@ class Pgp {
             val pgpFact = JcaPGPObjectFactory(decoderStream)
             val sig = (pgpFact.nextObject() as PGPSignatureList).firstOrNull {
                 pgpPublicKeyRings.contains(it.keyID)
-            } ?: return false to signedData
+            } ?: return signedData
             val key = pgpPublicKeyRings.getPublicKey(sig.keyID)
             sig.init(BcPGPContentVerifierBuilderProvider(), key)
             val buff = ByteArray(1024)
@@ -519,10 +521,12 @@ class Pgp {
                 read = signedDataStream.read(buff)
             }
             signedDataStream.close()
-            return sig.verify() to signedData
+
+            lastVerifyResult = sig.verify()
+            return signedData
         } catch (ex: Exception) {
             ex.printStackTrace()
-            return false to signedData
+            return signedData
         }
 
     }

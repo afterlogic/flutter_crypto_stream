@@ -166,13 +166,25 @@ class Pgp extends Crypt {
     }
   }
 
-  Future<VerifyResult> verifySign(String text) async {
+  Future<String> verifySign(String text) async {
     final result = await invokeMethod(
       "$algorithm.verifySign",
       [text],
     );
+    if (result is String) {
+      return result;
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> verifyResult() async {
+    final result = await invokeMethod(
+      "$algorithm.verifyResult",
+      [],
+    );
     if (result is List) {
-      return VerifyResult(result.first, result.last);
+      return result.first;
     } else {
       return null;
     }
@@ -207,11 +219,4 @@ class KeyPair {
   final String secret;
 
   KeyPair(this.public, this.secret);
-}
-
-class VerifyResult {
-  final bool verified;
-  final String text;
-
-  VerifyResult(this.verified, this.text);
 }
