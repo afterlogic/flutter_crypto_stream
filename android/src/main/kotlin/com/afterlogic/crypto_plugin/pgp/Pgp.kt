@@ -3,20 +3,20 @@ package com.afterlogic.crypto_plugin.pgp
 
 import KeyDescription
 import org.bouncycastle.bcpg.ArmoredOutputStream
+import org.bouncycastle.bcpg.BCPGOutputStream
+import org.bouncycastle.bcpg.HashAlgorithmTags
 import java.util.Date
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openpgp.*
 import org.bouncycastle.openpgp.operator.KeyFingerPrintCalculator
-import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator
 import java.security.*
 import org.bouncycastle.openpgp.operator.jcajce.*
 import java.io.*
 import org.bouncycastle.openpgp.PGPPublicKey
 import org.bouncycastle.openpgp.bc.BcPGPObjectFactory
-import org.bouncycastle.openpgp.operator.bc.BcPBEDataDecryptorFactory
-import org.bouncycastle.openpgp.operator.bc.BcPBEKeyEncryptionMethodGenerator
-import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory
+import org.bouncycastle.openpgp.operator.bc.*
 import org.bouncycastle.util.io.Streams
 import org.pgpainless.PGPainless
 import org.pgpainless.algorithm.CompressionAlgorithm
@@ -82,7 +82,7 @@ class Pgp {
     }
 
     @Throws(Exception::class)
-    fun decrypt(inputStream: InputStream, output: OutputStream, privateKey: String?, password: String?, fileLength: Long, publicKey: String?) {
+    fun decrypt(inputStream: InputStream, output: OutputStream, privateKey: String?, password: String?, fileLength: Long, publicKey: List<String>?) {
         this.progress?.stop = true
         val progress = Progress()
         this.progress = progress
@@ -105,24 +105,23 @@ class Pgp {
                             it.doNotDecrypt()
                         }
                     }
-                    .let {
+                    .let { builder ->
                         if (publicKey != null) {
-                            val keyStream = PGPUtil.getDecoderStream(ByteArrayInputStream(publicKey.toByteArray()))
-                            val pgpPub = PGPPublicKeyRingCollection(keyStream, calculator)
-                            it
+                            val publicKeyRings = publicKey.map { key ->
+                                KeyRingReader.readPublicKeyRing(ByteArrayInputStream(key.toByteArray()))
+                            }
+                            val pgpPub = PGPPublicKeyRingCollection(publicKeyRings)
+                            builder
                                     .verifyWith(pgpPub)
                                     .handleMissingPublicKeysWith {
                                         throw SignError()
                                     }
                         } else {
-                            it.doNotVerify()
+                            builder.doNotVerify()
                         }
                     }
                     .build()
 
-            if (privateKey == null) {
-                decryptionStream?.result?.isSigned
-            }
 
             val byffer = ByteArray(4096)
             var length: Int
@@ -276,9 +275,7 @@ class Pgp {
                              outputStream: OutputStream,
                              prepareEncrypt: File,
                              fileLength: Long,
-                             password: String,
-                             privateKey: String?,
-                             privateKeyPassword: String?) {
+                             password: String) {
         this.progress?.stop = true
         val progress = Progress()
         this.progress = progress
@@ -305,11 +302,8 @@ class Pgp {
                             .setSecureRandom(SecureRandom())
             )
 
-            encOut = if (privateKey != null && privateKeyPassword != null) {
-                sign(encGen.open(outputStream, prepareEncrypt.length()), privateKey, privateKeyPassword)
-            } else {
-                encGen.open(outputStream, prepareEncrypt.length())!!
-            }
+            encOut = encGen.open(outputStream, prepareEncrypt.length())!!
+
 
             val byffer = ByteArray(4096)
             var length: Int
@@ -335,7 +329,7 @@ class Pgp {
     }
 
     @Throws(IOException::class, PGPException::class)
-    fun symmetricallyDecrypt(inputStream: InputStream, outputStream: OutputStream, password: String, publicKey: String?) {
+    fun symmetricallyDecrypt(inputStream: InputStream, outputStream: OutputStream, password: String) {
         this.progress?.stop = true
         val progress = Progress()
         this.progress = progress
@@ -343,11 +337,7 @@ class Pgp {
         val pbe: PGPPBEEncryptedData
 
         val decoderInput = PGPUtil.getDecoderStream(
-                if (publicKey != null) {
-                    checkSign(inputStream, publicKey)
-                } else {
-                    inputStream
-                }
+                inputStream
         )
 
         try {
@@ -441,7 +431,7 @@ class Pgp {
     }
 
 
-    fun sign(output: OutputStream, privateKey: String, password: String): EncryptionStream {
+    private fun sign(output: OutputStream, privateKey: String, password: String): EncryptionStream {
         return EncryptionBuilder()
                 .onOutputStream(output)
                 .doNotEncrypt()
@@ -454,6 +444,86 @@ class Pgp {
                 }
                 .asciiArmor()
 
+
+    }
+
+    fun addSignature(text: String, privateKeyText: String, password: String): String {
+        val inputStream = ByteArrayInputStream(text.toByteArray())
+        val outputStream = ByteArrayOutputStream()
+        val settings = KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.SHA512, 0)
+        val secretKeys = KeyRingReader().secretKeyRing(privateKeyText).secretKey
+        val secretKeyDecryptor = PasswordBasedSecretKeyRingProtector(settings, SecretKeyPassphraseProvider { Passphrase(password.toCharArray()) })
+        val privateKey = secretKeys.extractPrivateKey(secretKeyDecryptor.getDecryptor(secretKeys.keyID))
+
+        val signatureAlgo = HashAlgorithmTags.SHA256
+        val signatureGenerator = PGPV3SignatureGenerator(
+                BcPGPContentSignerBuilder(privateKey.publicKeyPacket.algorithm, signatureAlgo))
+        signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, privateKey)
+
+        val armor = ArmoredOutputStream(outputStream)
+        val stream = BCPGOutputStream(armor)
+
+        val buff = ByteArray(1024)
+        var read = inputStream.read(buff)
+        while (read != -1) {
+            signatureGenerator.update(buff, 0, read)
+            read = inputStream.read(buff)
+        }
+        signatureGenerator.generate().encode(stream)
+        armor.close()
+        stream.close()
+        outputStream.close()
+        val signature = outputStream.toByteArray()
+
+        return PGP_SIGN_TITLE + "\r\n" +
+                "Hash: SHA256\r\n\r\n" +
+                text + "\r\n" +
+                String(signature)
+    }
+
+    fun verifySignature(text: String, publicKeys: List<String>): Pair<Boolean, String> {
+
+
+        val startMessage = text.indexOf(PGP_SIGN_TITLE)
+                .let {
+                    text.indexOf("\n", startIndex = it + PGP_SIGN_TITLE.length + 4)
+                } + 3
+
+        val startSignature = text.indexOf(BEGIN_SIGNATURE)
+        if (startSignature < 0)
+            return false to ""
+        val endSignature = text.indexOf(END_SIGNATURE).let {
+            if (it < 0)
+                return false to ""
+            it + END_SIGNATURE.length
+        }
+        val signedData = text.substring(startMessage, startSignature - 2)
+        val signedDataStream = ByteArrayInputStream(signedData.toByteArray())
+
+        val signature = ByteArrayInputStream(text.substring(startSignature, endSignature).toByteArray())
+        try {
+
+            val decoderStream = PGPUtil.getDecoderStream(signature)
+            val pgpPublicKeyRings = PGPPublicKeyRingCollection(publicKeys.map { KeyRingReader().publicKeyRing(it) })
+
+            val pgpFact = JcaPGPObjectFactory(decoderStream)
+            val sig = (pgpFact.nextObject() as PGPSignatureList).firstOrNull {
+                pgpPublicKeyRings.contains(it.keyID)
+            } ?: return false to signedData
+            val key = pgpPublicKeyRings.getPublicKey(sig.keyID)
+            sig.init(BcPGPContentVerifierBuilderProvider(), key)
+            val buff = ByteArray(1024)
+            var read = signedDataStream.read(buff)
+            while (read != -1) {
+                sig.update(buff, 0, read)
+                read = signedDataStream.read(buff)
+            }
+            signedDataStream.close()
+            return sig.verify() to signedData
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return false to signedData
+        }
 
     }
 
@@ -471,5 +541,12 @@ class Pgp {
         } catch (e: Throwable) {
             false
         }
+    }
+
+
+    companion object {
+        private const val PGP_SIGN_TITLE = "-----BEGIN PGP SIGNED MESSAGE-----"
+        private const val BEGIN_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
+        private const val END_SIGNATURE = "-----END PGP SIGNATURE-----"
     }
 }

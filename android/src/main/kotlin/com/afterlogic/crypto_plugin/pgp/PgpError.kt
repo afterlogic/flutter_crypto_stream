@@ -6,6 +6,6 @@ enum class ErrorCase {
     Sign, Input
 }
 
-class SignError : PgpError("check sign assert error", ErrorCase.Sign)
+class SignError : PgpError("check addSignature assert error", ErrorCase.Sign)
 
 class InputDataError : PgpError("invalid input data", ErrorCase.Input)

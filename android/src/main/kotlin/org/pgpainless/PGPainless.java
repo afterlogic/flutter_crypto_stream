@@ -50,7 +50,7 @@ public class PGPainless {
     }
 
     /**
-     * Create an {@link EncryptionStream}, which can be used to encrypt and/or sign data using OpenPGP.
+     * Create an {@link EncryptionStream}, which can be used to encrypt and/or addSignature data using OpenPGP.
      * @return builder
      */
     public static EncryptionBuilder createEncryptor() {

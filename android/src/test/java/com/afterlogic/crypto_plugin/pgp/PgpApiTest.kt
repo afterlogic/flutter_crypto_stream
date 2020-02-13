@@ -1,6 +1,5 @@
 package com.afterlogic.crypto_plugin.pgp
 
-import org.bouncycastle.openpgp.operator.jcajce.JcePBEKeyEncryptionMethodGenerator
 import org.bouncycastle.util.io.Streams
 import org.junit.Test
 import java.io.ByteArrayInputStream
@@ -36,7 +35,7 @@ class PgpApiTest {
         pgpHelper.setPublicKeys(listOf(keys[0]))
 
         val message = "message".toByteArray()
-        val messageD = pgpHelper.encriptBytes(message, null)
+        val messageD = pgpHelper.encryptBytes(message, null)
         val messageE = pgpHelper.decryptBytes(messageD, password)
         assert(String(messageE) == String(message))
     }
@@ -48,7 +47,7 @@ class PgpApiTest {
         pgpHelper.setPublicKeys(listOf(publicKey))
 
         val message = "message".toByteArray()
-        val messageEncrypted = pgpHelper.encriptBytes(message, null)
+        val messageEncrypted = pgpHelper.encryptBytes(message, null)
         val messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
         assert(String(messageDecrypted) == String(message))
     }
@@ -76,30 +75,30 @@ class PgpApiTest {
         pgpHelper.setPublicKeys(listOf(publicKey))
         pgpHelper.setPrivateKey(privateKey)
 
-        var messageEncrypted = pgpHelper.encriptBytes(message, password)
-        var messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password, true)
+        var messageEncrypted = pgpHelper.encryptBytes(message, password)
+        var messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
         assert(String(messageDecrypted) == String(message))
 
-        messageEncrypted = pgpHelper.encriptBytes(message, password)
-        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password, true)
+        messageEncrypted = pgpHelper.encryptBytes(message, password)
+        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
         assert(String(messageDecrypted) == String(message))
 
-        messageEncrypted = pgpHelper.encriptBytes(message, password)
-        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password, false)
+        messageEncrypted = pgpHelper.encryptBytes(message, password)
+        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
         assert(String(messageDecrypted) == String(message))
 
         try {
-            messageEncrypted = pgpHelper.encriptBytes(message, password)
+            messageEncrypted = pgpHelper.encryptBytes(message, password)
             pgpHelper.setPublicKeys(listOf(otherPublicKey))
-            pgpHelper.decryptBytes(messageEncrypted, password, true)
+            pgpHelper.decryptBytes(messageEncrypted, password)
             throw Throwable("failed check Sign")
         } catch (e: SignError) {
         }
 
         try {
             pgpHelper.setPublicKeys(listOf(publicKey))
-            messageEncrypted = pgpHelper.encriptBytes(message, password + "1")
-            pgpHelper.decryptBytes(messageEncrypted, password, true)
+            messageEncrypted = pgpHelper.encryptBytes(message, password + "1")
+            pgpHelper.decryptBytes(messageEncrypted, password)
             throw Throwable("failed check Sign")
         } catch (e: InputDataError) {
             e
@@ -109,29 +108,15 @@ class PgpApiTest {
     @Test
     fun testPrimarySign() {
         val message = "message asd adasdasd"
-        val inputStream = ByteArrayInputStream(message.toByteArray())
-        val outputStream = ByteArrayOutputStream()
-        val signStream = Pgp().sign(outputStream, privateKey, password)
 
-        Streams.pipeAll(inputStream, signStream)
-        signStream.close()
-        try {
-            val inputStream1 = ByteArrayInputStream(outputStream.toByteArray())
-            val outputStream1 = ByteArrayOutputStream()
-            val checkSignStream = Pgp().checkSign(inputStream1, otherPublicKey)
-            Streams.pipeAll(checkSignStream, outputStream1)
-            checkSignStream.close()
-            throw Throwable("failed check Sign")
-        } catch (e: SignError) {
+        val signed = Pgp().addSignature(message, privateKey, password)
 
-            val inputStream1 = ByteArrayInputStream(outputStream.toByteArray())
-            val outputStream1 = ByteArrayOutputStream()
-            val checkSignStream = Pgp().checkSign(inputStream1, publicKey)
-            Streams.pipeAll(checkSignStream, outputStream1)
-            checkSignStream.close()
-            assert(message == outputStream1.toByteArray().toString(Charset.defaultCharset()))
-        }
 
+        var verify = Pgp().verifySignature(signed, listOf(otherPublicKey))
+        assert(!verify.first)
+        verify = Pgp().verifySignature(signed, listOf(publicKey))
+        assert(verify.first)
+        assert(verify.second==message)
     }
 
     @Test

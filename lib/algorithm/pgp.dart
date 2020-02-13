@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -51,19 +50,18 @@ class Pgp extends Crypt {
   }
 
   Future<List<int>> decryptBytes(
-      Uint8List encryptedBytes, String password, bool checkSign) async {
+      Uint8List encryptedBytes, String password) async {
     final result = await invokeMethod(
       "$algorithm.decryptBytes",
-      [encryptedBytes, password, checkSign],
+      [encryptedBytes, password],
     );
     return List<int>.from(result);
   }
 
-  Future decryptFile(
-      File inputFile, File outputFile, String password, bool checkSign) async {
+  Future decryptFile(File inputFile, File outputFile, String password) async {
     await invokeMethod(
       "$algorithm.decryptFile",
-      [inputFile.path, outputFile.path, password, checkSign],
+      [inputFile.path, outputFile.path, password],
     );
   }
 
@@ -155,6 +153,30 @@ class Pgp extends Crypt {
       return null;
     }
   }
+
+  Future<String> addSign(String text, String password) async {
+    final result = await invokeMethod(
+      "$algorithm.addSign",
+      [text, password],
+    );
+    if (result is String) {
+      return result;
+    } else {
+      return null;
+    }
+  }
+
+  Future<VerifyResult> verifySign(String text) async {
+    final result = await invokeMethod(
+      "$algorithm.verifySign",
+      [text],
+    );
+    if (result is List) {
+      return VerifyResult(result.first, result.last);
+    } else {
+      return null;
+    }
+  }
 }
 
 class Progress {
@@ -185,4 +207,11 @@ class KeyPair {
   final String secret;
 
   KeyPair(this.public, this.secret);
+}
+
+class VerifyResult {
+  final bool verified;
+  final String text;
+
+  VerifyResult(this.verified, this.text);
 }

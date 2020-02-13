@@ -1,7 +1,8 @@
 import 'package:flutter/services.dart';
 
-import '../error/cryptor_exception.dart';
+import '../error/crypto_exception.dart';
 import '../error/pgp_error.dart';
+
 const _cryptPluginChannel = const MethodChannel("crypto_plugin");
 
 Future<dynamic> _invokeMethod(_EncapsulateMethod _invokeMethod) async {
@@ -18,10 +19,10 @@ Future<dynamic> _invokeMethod(_EncapsulateMethod _invokeMethod) async {
         case "1":
           throw PgpInputError();
         default:
-          throw CryptException("", e, stack);
+          throw CryptoException("", e, stack);
       }
     }
-    throw CryptException("", e, stack);
+    throw CryptoException("", e, stack);
   }
 }
 

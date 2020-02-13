@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Classes used to encrypt or sign data using OpenPGP.
+ * Classes used to encrypt or addSignature data using OpenPGP.
  */
 package org.pgpainless.encryption_signing;

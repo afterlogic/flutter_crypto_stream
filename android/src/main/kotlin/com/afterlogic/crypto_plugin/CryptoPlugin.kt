@@ -115,16 +115,14 @@ class CryptoPlugin : MethodCallHandler {
                     "decryptBytes" -> {
                         val array = arguments[0] as ByteArray
                         val password = arguments[1] as String
-                        val checkSign = arguments[3] as Boolean
-                        return pgp.decryptBytes(array, password, checkSign)
+                        return pgp.decryptBytes(array, password)
 
                     }
                     "decryptFile" -> {
                         val inputFile = arguments[0] as String
                         val outputFile = arguments[1] as String
                         val password = arguments[2] as String
-                        val checkSign = arguments[3] as Boolean
-                        pgp.decryptFile(inputFile, outputFile, password, checkSign)
+                        pgp.decryptFile(inputFile, outputFile, password)
                         return ""
                     }
                     "encryptFile" -> {
@@ -137,7 +135,7 @@ class CryptoPlugin : MethodCallHandler {
                     "encryptBytes" -> {
                         val text = arguments[0] as ByteArray
                         val passwordForSign = arguments[1] as String?
-                        return pgp.encriptBytes(text, passwordForSign)
+                        return pgp.encryptBytes(text, passwordForSign)
 
                     }
                     "decryptSymmetricBytes" -> {
@@ -176,6 +174,16 @@ class CryptoPlugin : MethodCallHandler {
                         val password = arguments[0] as String
                         val privateKey = arguments[1] as String
                         return pgp.checkPassword(password, privateKey)
+                    }
+                    "addSign" -> {
+                        val text = arguments[0] as String
+                        val password = arguments[1] as String
+                        return pgp.addSign(text, password)
+                    }
+                    "verifySign" -> {
+                        val text = arguments[0] as String
+                        val result = pgp.verifySign(text)
+                        return listOf(result.first, result.second)
                     }
                 }
             }

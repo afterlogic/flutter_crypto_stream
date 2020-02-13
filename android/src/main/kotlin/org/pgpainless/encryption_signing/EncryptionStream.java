@@ -119,9 +119,9 @@ public final class EncryptionStream extends OutputStream {
             outerMostStream = publicKeyEncryptedStream;
         }
 
-        // If we want to sign, prepare for signing
+        // If we want to addSignature, prepare for signing
         if (!signingKeys.isEmpty()) {
-            LOGGER.log(LEVEL, "At least one signing key is available -> sign " + hashAlgorithm + " hash of message");
+            LOGGER.log(LEVEL, "At least one signing key is available -> addSignature " + hashAlgorithm + " hash of message");
             for (PGPPrivateKey privateKey : signingKeys) {
                 LOGGER.log(LEVEL, "Sign using key " + Long.toHexString(privateKey.getKeyID()));
                 BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder(
@@ -140,7 +140,7 @@ public final class EncryptionStream extends OutputStream {
                 compressionAlgorithm.getAlgorithmId());
         basicCompressionStream = new BCPGOutputStream(compressedDataGenerator.open(outerMostStream));
 
-        // If we want to sign, sign!
+        // If we want to addSignature, addSignature!
         for (PGPSignatureGenerator signatureGenerator : signatureGenerators) {
             signatureGenerator.generateOnePassVersion(false).encode(basicCompressionStream);
         }
