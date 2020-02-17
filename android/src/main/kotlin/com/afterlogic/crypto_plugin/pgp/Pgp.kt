@@ -486,12 +486,26 @@ class Pgp {
     fun verifySignature(text: String, publicKeys: List<String>): String {
 
         lastVerifyResult = false
+
         val startMessage = text.indexOf(PGP_SIGN_TITLE)
                 .let {
-                    text.indexOf("\n", startIndex = it + PGP_SIGN_TITLE.length + 4)
-                } + 3
+                    var index = text.indexOf("\n", startIndex = it + PGP_SIGN_TITLE.length) + 1
+                    index = text.indexOf("\n", startIndex = index) + 1
+                    text.indexOf("\n", startIndex = index) + 1
+                }
 
         val startSignature = text.indexOf(BEGIN_SIGNATURE)
+
+        val endData = text.substring(startMessage, startSignature).let { text ->
+            text.lastIndexOf("\n").let {
+                if (text[it - 1] == '\r') {
+                    it - 1
+                } else {
+                    it
+                }
+            }
+        } + startMessage
+
         if (startSignature < 0)
             return ""
         val endSignature = text.indexOf(END_SIGNATURE).let {
@@ -499,7 +513,7 @@ class Pgp {
                 return ""
             it + END_SIGNATURE.length
         }
-        val signedData = text.substring(startMessage, startSignature - 2)
+        val signedData = text.substring(startMessage, endData)
         val signedDataStream = ByteArrayInputStream(signedData.toByteArray())
 
         val signature = ByteArrayInputStream(text.substring(startSignature, endSignature).toByteArray())
