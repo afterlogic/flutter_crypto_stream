@@ -30,7 +30,7 @@ class PgpApiTest {
     @Test
     fun testGenerateKey() {
         val pgpHelper = PgpApi()
-        val keys = pgpHelper.createKeys(2000, "test@afterlogic.com", "111")
+        var keys = pgpHelper.createKeys(2000, "test@afterlogic.com", "111")
         pgpHelper.setPrivateKey(keys[1])
         pgpHelper.setPublicKeys(listOf(keys[0]))
 
@@ -38,6 +38,10 @@ class PgpApiTest {
         val messageD = pgpHelper.encryptBytes(message, null)
         val messageE = pgpHelper.decryptBytes(messageD, password)
         assert(String(messageE) == String(message))
+
+        keys = pgpHelper.createKeys(4000, "test@afterlogic.com", "111")
+        val description = pgpHelper.getKeyDescription(keys.first())
+        assert(description.length == 4096)
     }
 
     @Test
