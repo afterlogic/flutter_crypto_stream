@@ -55,6 +55,9 @@ public class PlatformInputStream extends InputStream {
 
     @Override
     public void close() {
+        if (countDownLatch != null) {
+            countDownLatch.countDown();
+        }
         isClosed = true;
     }
 }

@@ -27,12 +27,12 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
     private val executionScheduler: Scheduler = SingleScheduler()
     private val disposable = CompositeDisposable()
-    private var flutterCallback = FlutterCallback()
+    private val subject = BehaviorSubject.create<() -> Unit>()
     private val pgpApi = PgpApi()
     private val pgpUtilApi = PgpUtilApi()
     private var output: PlatformOutputStream? = null
     private var input: PlatformInputStream? = null
-    private val subject = BehaviorSubject.create<() -> Unit>()
+    private var flutterCallback = FlutterCallback()
 
 
     init {
