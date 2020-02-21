@@ -117,45 +117,53 @@ public class PgpApi {
                         String[] publicKeys,
                         final String password,
                         InputStream inputStream,
-                        OutputStream outputStream) throws IOException, PGPException {
-        lastVerifyResult = true;
+                        OutputStream outputStream) throws IOException, PGPException, PgpError {
+        try {
+            lastVerifyResult = true;
 
-        DecryptionBuilderInterface.DecryptWith decryptWith = new DecryptionBuilder().onInputStream(inputStream);
+            DecryptionBuilderInterface.DecryptWith decryptWith = new DecryptionBuilder().onInputStream(inputStream);
 
-        KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.MD5, 0);
-        PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
-        PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
-            @Override
-            public Passphrase getPassphraseFor(Long keyId) {
-                return new Passphrase(password.toCharArray());
+            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.MD5, 0);
+            PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
+            PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
+                @Override
+                public Passphrase getPassphraseFor(Long keyId) {
+                    return new Passphrase(password.toCharArray());
+                }
+            });
+
+            DecryptionBuilderInterface.VerifyWith verifyWith = decryptWith.decryptWith(
+                    secretKeyRingProtector,
+                    BCUtil.keyRingsToKeyRingCollection(secretKeys)
+            );
+
+            DecryptionBuilderInterface.Build build;
+            if (publicKeys != null && publicKeys.length != 0) {
+
+                build = verifyWith.verifyWith(PgpUtilApi.getPublicKeyRing(publicKeys))
+                        .handleMissingPublicKeysWith(new MissingPublicKeyCallback() {
+                            @Override
+                            public PGPPublicKey onMissingPublicKeyEncountered(Long keyId) {
+                                lastVerifyResult = false;
+                                return null;
+                            }
+                        });
+            } else {
+                build = verifyWith.doNotVerify();
             }
-        });
 
-        DecryptionBuilderInterface.VerifyWith verifyWith = decryptWith.decryptWith(
-                secretKeyRingProtector,
-                BCUtil.keyRingsToKeyRingCollection(secretKeys)
-        );
-
-        DecryptionBuilderInterface.Build build;
-        if (publicKeys != null && publicKeys.length != 0) {
-
-            build = verifyWith.verifyWith(PgpUtilApi.getPublicKeyRing(publicKeys))
-                    .handleMissingPublicKeysWith(new MissingPublicKeyCallback() {
-                        @Override
-                        public PGPPublicKey onMissingPublicKeyEncountered(Long keyId) {
-                            lastVerifyResult = false;
-                            return null;
-                        }
-                    });
-        } else {
-            build = verifyWith.doNotVerify();
+            InputStream decryptionStream = build.build();
+            Streams.pipeAll(decryptionStream, outputStream);
+            decryptionStream.close();
+            inputStream.close();
+            outputStream.close();
+        } catch (Throwable e) {
+            if (e instanceof PgpError) {
+                throw (PgpError) e;
+            } else {
+                throw new PgpError(PgpErrorCase.Undefined);
+            }
         }
-
-        InputStream decryptionStream = build.build();
-        Streams.pipeAll(decryptionStream, outputStream);
-        decryptionStream.close();
-        inputStream.close();
-        outputStream.close();
     }
 
     public String sign(String text, String privateKey, final String password) throws PgpError {
@@ -290,7 +298,7 @@ public class PgpApi {
                                      OutputStream outputStream,
                                      File prepareEncrypt,
                                      Long length,
-                                     String password) throws IOException, PGPException, PgpError {
+                                     String password) throws PgpError {
         try {
 
             SymmetricKeyAlgorithm encryptionAlgorithm = SymmetricKeyAlgorithm.AES_256;

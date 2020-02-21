@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto_plugin/algorithm/pgp.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,6 +40,7 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
 
   final textCtrl = TextEditingController();
   var outText = "";
+  List<int> outByte = [];
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +52,57 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
             TextFormField(
               controller: textCtrl,
             ),
-            Row(
-              children: <Widget>[
-                FlatButton(
-                  child: Text("^encrypt"),
-                  onPressed: encrypt,
-                ),
-                FlatButton(
-                  child: Text("_decrypt"),
-                  onPressed: decrypt,
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text("encrypt"),
+                        onPressed: encrypt,
+                      ),
+                      FlatButton(
+                        child: Text("decrypt"),
+                        onPressed: decrypt,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text("symmetricallyEncrypt"),
+                        onPressed: symmetricallyEncrypt,
+                      ),
+                      FlatButton(
+                        child: Text("symmetricallyDecrypt"),
+                        onPressed: symmetricallyDecrypt,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text("sign"),
+                        onPressed: sign,
+                      ),
+                      FlatButton(
+                        child: Text("verify"),
+                        onPressed: verify,
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: FlatButton(
+                      child: Text("checkKey"),
+                      onPressed: checkKey,
+                    ),
+                  ),
+                ],
+              ),
             ),
             Text(outText),
           ],
@@ -69,22 +112,22 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   }
 
   encrypt() async {
-    var text = textCtrl.text;
-    var encrypted = List<int>();
+    var currentBytes = textCtrl.text.codeUnits;
+    outByte = List<int>();
     pgp.encrypt(null, [publicKey], password).listen((data) {
-      encrypted.addAll(data);
+      outByte.addAll(data);
     }).onDone(() {
-      outText = String.fromCharCodes(encrypted);
+      outText = String.fromCharCodes(outByte);
       setState(() {});
     });
 
     final platformSink = pgp.platformSink();
     final step = 100;
-    var count = text.codeUnits.length / step;
+    var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(text.codeUnits
-            .getRange(i * step, min((i + 1) * step, text.codeUnits.length))
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
             .toList());
       }
     } catch (e) {}
@@ -92,29 +135,120 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   }
 
   decrypt() async {
-    var text = outText;
-    var encrypted = List<int>();
+    var currentBytes = outByte;
+    outByte = List<int>();
     pgp.decrypt(privateKey, null, password).listen((data) {
-      encrypted.addAll(data);
+      outByte.addAll(data);
     }).onDone(() {
-      outText = String.fromCharCodes(encrypted);
+      outText = String.fromCharCodes(outByte);
       setState(() {});
     });
 
     final platformSink = pgp.platformSink();
     final step = 100;
-    var count = text.codeUnits.length / step;
+    var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(text.codeUnits
-            .getRange(i * step, min((i + 1) * step, text.codeUnits.length))
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
             .toList());
       }
     } catch (e) {}
     await platformSink.close();
   }
+
+  symmetricallyEncrypt() async {
+    Directory tempDir = await getTemporaryDirectory();
+    File tempFile = File(tempDir.path + Platform.pathSeparator + "temp.temp");
+    if (await tempFile.exists()) {
+      await tempFile.delete();
+    }
+    await tempFile.create();
+
+    var currentBytes = outByte;
+    outByte = List<int>();
+    pgp.symmetricallyEncrypt(tempFile, password, currentBytes.length).listen(
+      (data) {
+        outByte.addAll(data);
+      },
+    ).onDone(
+      () {
+        outText = String.fromCharCodes(outByte);
+        setState(() {});
+      },
+    );
+
+    final platformSink = pgp.platformSink();
+    final step = 100;
+    var count = currentBytes.length / step;
+    try {
+      for (int i = 0; i < count; i++) {
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
+      }
+    } catch (e) {}
+    await platformSink.close();
+  }
+
+  symmetricallyDecrypt() async {
+    var currentBytes = outByte;
+    outByte = List<int>();
+    pgp.symmetricallyDecrypt(password).listen(
+      (data) {
+        outByte.addAll(data);
+      },
+    ).onDone(
+      () {
+        outText = String.fromCharCodes(outByte);
+        setState(() {});
+      },
+    );
+
+    final platformSink = pgp.platformSink();
+    final step = 100;
+    var count = currentBytes.length / step;
+    try {
+      for (int i = 0; i < count; i++) {
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
+      }
+    } catch (e) {}
+    await platformSink.close();
+  }
+
+  sign() async {
+    var text = textCtrl.text;
+    outText = await pgp.sign(text, privateKey, password);
+    setState(() {});
+  }
+
+  verify() async {
+    var text = outText;
+    outText = await pgp.verify(text, publicKey);
+    setState(() {});
+  }
+
+  checkKey() async {
+    outText = "";
+    final pair = await pgp.createKeys(2000, email, password);
+
+    final success = await pgp.checkKeyPassword(pair.privateKey, password);
+    outText += "checkKeyPassword = $success";
+    outText +="\n\n\n";
+    final infoPrivate = await pgp.getKeyDescription(pair.privateKey);
+    outText +=
+        "privateKey : \n emails= ${infoPrivate.emails}\nlength= ${infoPrivate.length}\nisPrivate= ${infoPrivate.isPrivate}";
+    outText +="\n\n\n";
+    final infoPublic = await pgp.getKeyDescription(pair.publicKey);
+    outText +=
+        "privateKey : \n emails= ${infoPublic.emails}\nlength= ${infoPublic.length}\nisPrivate= ${infoPublic.isPrivate}";
+    setState(() {});
+  }
 }
 
+final email = "test@test.com";
 final password = "111";
 
 final privateKey =

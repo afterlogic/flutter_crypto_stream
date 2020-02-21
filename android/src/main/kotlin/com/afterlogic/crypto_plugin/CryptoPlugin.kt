@@ -25,7 +25,6 @@ import java.io.File
 
 class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
-    private val getterScheduler: Scheduler = SingleScheduler()
     private val executionScheduler: Scheduler = SingleScheduler()
     private val disposable = CompositeDisposable()
     private var flutterCallback = FlutterCallback()
@@ -155,7 +154,7 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
                 it.onError(e)
             }
         }
-                .subscribeOn(if (arguments.isEmpty()) getterScheduler else executionScheduler)
+                .subscribeOn(executionScheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     result.success(it)
@@ -192,14 +191,15 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
                         val result = pgpUtilApi.getKeyDescription(key)
 
-                        return arrayOf(result.length, result.emails, result.isPrivate)
+                        return listOf(result.length, result.emails, result.isPrivate)
                     }
                     "createKeys" -> {
                         val length = (arg.next() as Number).toInt()
                         val email = arg.next() as String
                         val password = arg.next() as String
 
-                        return pgpUtilApi.createKeys(length, email, password)
+                        val result = pgpUtilApi.createKeys(length, email, password)
+                        return listOf(result[0], result[1])
                     }
                     "checkKeyPassword" -> {
                         val key = arg.next() as String
@@ -207,7 +207,21 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
                         return pgpUtilApi.checkKeyPassword(key, password)
                     }
+                    "lastVerifyResult" -> {
+                        return pgpApi.lastVerifyResult
+                    }
+                    "sign" -> {
+                        val text = arg.next() as String
+                        val privateKey = arg.next() as String
+                        val password = arg.next() as String
+                        return pgpApi.sign(text, privateKey, password)
+                    }
+                    "verify" -> {
+                        val text = arg.next() as String
+                        val publicKey = arg.next() as String
 
+                        return pgpApi.verify(text, arrayOf(publicKey))
+                    }
                 }
             }
         }
@@ -246,7 +260,7 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
     inner class FlutterSink(private val events: EventChannel.EventSink) : StreamSink() {
 
-        override fun add(bytes: IntArray) {
+        override fun add(bytes: ByteArray) {
             subject.onNext {
                 events.success(bytes)
             }

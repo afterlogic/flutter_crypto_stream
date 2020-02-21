@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   crypto_plugin:
     path: ..
+  path_provider: ^1.6.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

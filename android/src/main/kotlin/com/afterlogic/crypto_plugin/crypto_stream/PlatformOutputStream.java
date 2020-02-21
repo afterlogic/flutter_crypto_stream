@@ -3,12 +3,13 @@ package com.afterlogic.crypto_plugin.crypto_stream;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class PlatformOutputStream extends OutputStream {
     private final StreamSink sink;
     private static final int BUFFER_SIZE = 16 << 8;
-    private int[] buffer = new int[BUFFER_SIZE];
-    private long count = 0;
+    private byte[] buffer = new byte[BUFFER_SIZE];
+
     private int position = 0;
 
     public PlatformOutputStream(StreamSink sink) {
@@ -32,10 +33,11 @@ public class PlatformOutputStream extends OutputStream {
     }
 
     private void sendBuffer() {
-        count += BUFFER_SIZE;
-        sink.add(buffer);
+        if (position != 0) {
+            sink.add(Arrays.copyOfRange(buffer, 0, position));
+        }
         position = 0;
-        buffer = new int[BUFFER_SIZE];
+        buffer = new byte[BUFFER_SIZE];
     }
 
 

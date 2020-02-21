@@ -12,7 +12,7 @@ class PlatformStreamTest {
         val array = arrayListOf<IntArray>()
 
         val output = PlatformOutputStream(object : StreamSink() {
-            override fun add(bytes: IntArray, isEnd: Boolean) {
+            override fun add(bytes: ByteArray) {
 
             }
         })
