@@ -1,5 +1,7 @@
 package com.afterlogic.crypto_plugin.pgp
 
+import com.afterlogic.pgp.PgpApi
+import com.afterlogic.pgp.PgpUtilApi
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

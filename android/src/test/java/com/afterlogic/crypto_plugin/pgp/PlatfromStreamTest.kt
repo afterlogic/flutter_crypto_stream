@@ -1,9 +1,9 @@
 package com.afterlogic.crypto_plugin.pgp
 
-import com.afterlogic.crypto_plugin.crypto_stream.PlatformInputStream
-import com.afterlogic.crypto_plugin.crypto_stream.PlatformOutputStream
-import com.afterlogic.crypto_plugin.crypto_stream.StreamCallback
-import com.afterlogic.crypto_plugin.crypto_stream.StreamSink
+import com.afterlogic.pgp.platform_stream.PlatformInputStream
+import com.afterlogic.pgp.platform_stream.PlatformOutputStream
+import com.afterlogic.pgp.platform_stream.StreamCallback
+import com.afterlogic.pgp.platform_stream.StreamSink
 import org.junit.Test
 
 class PlatformStreamTest {
