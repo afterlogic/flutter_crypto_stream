@@ -1,161 +1,128 @@
 package com.afterlogic.crypto_plugin.pgp
 
-import org.bouncycastle.util.io.Streams
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.charset.Charset
 
 class PgpApiTest {
-
     @Test
-    fun testFile() {
-        val file = File(testFile)
-        assert(file.exists()) { "past you test file in 'testFile'" }
-        assert(file.canRead()) { "cant read file" }
-        assert(file.canWrite()) { "cant write file" }
+    fun encryptDecrypt() {
+        var result = encryptDecryptMessage("test", privateKey, publicKey, password)
+        assert(result.verify && result.decrypted)
+
+        result = encryptDecryptMessage("test\r\n", privateKey, publicKey, password)
+        assert(result.verify && result.decrypted)
+
+        result = encryptDecryptMessage("test", privateKey, otherPublicKey, password)
+        assert(!result.decrypted)
+
+        result = encryptDecryptMessage("test", privateKey, publicKey, password + "1")
+        assert(!result.decrypted)
     }
 
     @Test
-    fun testGetUserUid() {
-        val pgpHelper = PgpApi()
-        val keys = pgpHelper.createKeys(2000, "test@afterlogic.com", "111")
-        var result = pgpHelper.getKeyDescription(keys.first())
-        assert(result.emails.size == 1 && result.emails[0] == "test@afterlogic.com")
-        result = pgpHelper.getKeyDescription(keys[1])
-        assert(result.emails.size == 1 && result.emails[0] == "test@afterlogic.com")
+    fun clearSign() {
+        var result = signVerifyMessage("test", privateKey, publicKey, password)
+        assert(result.verify && result.decrypted)
+
+        result = signVerifyMessage("test\r\n", privateKey, publicKey, password)
+        assert(result.verify && result.decrypted)
+
+        result = signVerifyMessage("test", privateKey, otherPublicKey, password)
+        assert(!result.verify)
+
+        result = signVerifyMessage("test", privateKey, publicKey, password + "1")
+        assert(!result.encrypted)
     }
 
     @Test
-    fun testGenerateKey() {
-        val pgpHelper = PgpApi()
-        var keys = pgpHelper.createKeys(2000, "test@afterlogic.com", "111")
-        pgpHelper.setPrivateKey(keys[1])
-        pgpHelper.setPublicKeys(listOf(keys[0]))
+    fun util() {
+        val pgpUtilApi = PgpUtilApi()
+        val email = "test@test.com"
+        val password = "123"
+        val length = 2000
 
-        val message = "message".toByteArray()
-        val messageD = pgpHelper.encryptBytes(message, null)
-        val messageE = pgpHelper.decryptBytes(messageD, password)
-        assert(String(messageE) == String(message))
-
-        keys = pgpHelper.createKeys(4000, "test@afterlogic.com", "111")
-        val description = pgpHelper.getKeyDescription(keys.first())
-        assert(description.length == 4096)
+        val keys = pgpUtilApi.createKeys(length, email, password)
+        var description = pgpUtilApi.getKeyDescription(keys[0])
+        assert(!description.isPrivate && description.emails[0] == email && description.length - length < 100)
+        description = pgpUtilApi.getKeyDescription(keys[1])
+        assert(description.isPrivate && description.emails[0] == email && description.length - length < 100)
     }
 
     @Test
-    fun testPgpApi() {
-        val pgpHelper = PgpApi()
-        pgpHelper.setPrivateKey(privateKey)
-        pgpHelper.setPublicKeys(listOf(publicKey))
-
-        val message = "message".toByteArray()
-        val messageEncrypted = pgpHelper.encryptBytes(message, null)
-        val messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
-        assert(String(messageDecrypted) == String(message))
+    fun symmetricallyEncryptDecrypt() {
+        var result = symmetrically("test", "111", "111")
+        assert(result.decrypted)
+        result = symmetrically("test\r\n", "1112", "1112")
+        assert(result.decrypted)
+        result = symmetrically("test", "1111", "131")
+        assert(!result.decrypted)
     }
 
-
-    @Test
-    fun testFilePgpApi() {
-        val pgpHelper = PgpApi()
-        val startLength = File(testFile).length()
-
-        pgpHelper.setPrivateKey(privateKey)
-        pgpHelper.setPublicKeys(listOf(publicKey))
-
-        pgpHelper.encriptFile(testFile, testEncrypt, null)
-        pgpHelper.decryptFile(testEncrypt, testFile, password)
-        assert(startLength == File(testFile).length())
-    }
-
-    @Test
-    fun testSignPgpApi() {
-        val pgpHelper = PgpApi()
-
-        val message = "message".toByteArray()
-
-        pgpHelper.setPublicKeys(listOf(publicKey))
-        pgpHelper.setPrivateKey(privateKey)
-
-        var messageEncrypted = pgpHelper.encryptBytes(message, password)
-        var messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
-        assert(pgpHelper.verifyResult() == true)
-        assert(String(messageDecrypted) == String(message))
-
-        messageEncrypted = pgpHelper.encryptBytes(message, password)
-        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
-        assert(pgpHelper.verifyResult() == true)
-        assert(String(messageDecrypted) == String(message))
-
-        messageEncrypted = pgpHelper.encryptBytes(message, password)
-        messageDecrypted = pgpHelper.decryptBytes(messageEncrypted, password)
-        assert(pgpHelper.verifyResult() == true)
-        assert(String(messageDecrypted) == String(message))
-
-
-        messageEncrypted = pgpHelper.encryptBytes(message, password)
-        pgpHelper.setPublicKeys(listOf(otherPublicKey))
-        pgpHelper.decryptBytes(messageEncrypted, password)
-        assert(pgpHelper.verifyResult() == false)
-
-        pgpHelper.setPublicKeys(listOf(publicKey))
+    private fun symmetrically(message: String, password: String, decryptPassword: String): TestResult {
+        val pgp = PgpApi()
+        var inputStream = ByteArrayInputStream(message.toByteArray())
+        var outputStream = ByteArrayOutputStream()
         try {
-            pgpHelper.encryptBytes(message, password + "1")
+            pgp.symmetricallyEncrypt(
+                    inputStream,
+                    outputStream,
+                    File(testFile),
+                    message.toByteArray().count().toLong(),
+                    password)
         } catch (e: Throwable) {
-            assert(e is InputDataError)
+            return TestResult(verify = false, decrypted = false, encrypted = false)
+
+        }
+        inputStream = ByteArrayInputStream(outputStream.toByteArray())
+        outputStream = ByteArrayOutputStream()
+        try {
+            pgp.symmetricallyDecrypt(inputStream, outputStream, decryptPassword)
+        } catch (e: Throwable) {
+            return TestResult(verify = false, decrypted = false)
+
+        }
+        return TestResult(verify = pgp.lastVerifyResult, decrypted = outputStream.toByteArray().toString(Charsets.UTF_8) == message)
+    }
+
+    private fun signVerifyMessage(message: String, privateKey: String, publicKey: String, password: String): TestResult {
+        val pgp = PgpApi()
+        val signed = try {
+            pgp.sign(message, privateKey, password)
+        } catch (e: Throwable) {
+            return TestResult(verify = false, decrypted = false, encrypted = false)
+        }
+        val decrypted = pgp.verify(signed, arrayOf(publicKey))
+        return TestResult(verify = pgp.lastVerifyResult, decrypted = decrypted == message)
+    }
+
+    private fun encryptDecryptMessage(message: String, privateKey: String, publicKey: String, password: String): TestResult {
+        return try {
+            val pgp = PgpApi()
+            var inputStream = ByteArrayInputStream(message.toByteArray())
+            var outputStream = ByteArrayOutputStream()
+            try {
+                pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
+            } catch (e: Throwable) {
+                return TestResult(verify = false, decrypted = false, encrypted = false)
+            }
+            inputStream = ByteArrayInputStream(outputStream.toByteArray())
+            outputStream = ByteArrayOutputStream()
+            pgp.decrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
+
+            assert(message == outputStream.toByteArray().toString(Charsets.UTF_8))
+            TestResult(verify = pgp.lastVerifyResult, decrypted = true)
+        } catch (e: Throwable) {
+            TestResult(verify = false, decrypted = false)
         }
     }
 
-    @Test
-    fun testPrimarySign() {
-        val message = "message asd adasdasd"
-        val pgp = Pgp()
-        val signed = pgp.addSignature(message, privateKey, password)
 
-
-        var verify = pgp.verifySignature(signed, listOf(otherPublicKey))
-        assert(pgp.lastVerifyResult == false)
-        assert(verify == message)
-        verify = pgp.verifySignature(signed, listOf(publicKey))
-        assert(pgp.lastVerifyResult == true)
-        assert(verify == message)
-    }
-
-    @Test
-    fun testSymmetric() {
-        val pgpHelper = PgpApi()
-        val decrypt = File(testFile)
-        val encrypt = File(testEncrypt)
-        pgpHelper.setPrivateKey(privateKey)
-        pgpHelper.setPublicKeys(listOf(publicKey))
-        val startLength = File(testFile).length()
-        pgpHelper.setTempFile(temp)
-
-        pgpHelper.encryptSymmetricFile(decrypt.path, encrypt.path, password)
-        pgpHelper.decryptSymmetricFile(encrypt.path, decrypt.path, password)
-        assert(startLength == File(testFile).length())
-    }
-
-    @Test
-    fun testPassword() {
-        val pgp = PgpApi()
-        assert(pgp.checkPassword(password, privateKey))
-        assert(!pgp.checkPassword(password + 1, privateKey))
-    }
-
-    @Test
-    fun test() {
-        val pgp = Pgp()
-        val verify = pgp.verifySignature(testMessage, listOf(testKey))
-        assert(pgp.lastVerifyResult == true)
-        verify
-    }
+    class TestResult(val verify: Boolean, val decrypted: Boolean, val encrypted: Boolean = true)
 
 
     companion object {
-        // past you test file
         const val testFile = "C:\\Users\\NyAkovlev\\Downloads\\test.bmp"
 
 
