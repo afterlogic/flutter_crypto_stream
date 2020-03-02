@@ -1,13 +1,13 @@
 package com.afterlogic.crypto_plugin
 
 import com.afterlogic.crypto_plugin.aes.Aes
+import com.afterlogic.pgp.PgpApi
+import com.afterlogic.pgp.PgpError
+import com.afterlogic.pgp.PgpUtilApi
 import com.afterlogic.pgp.platform_stream.PlatformInputStream
 import com.afterlogic.pgp.platform_stream.PlatformOutputStream
 import com.afterlogic.pgp.platform_stream.StreamCallback
 import com.afterlogic.pgp.platform_stream.StreamSink
-import com.afterlogic.pgp.PgpApi
-import com.afterlogic.pgp.PgpError
-import com.afterlogic.pgp.PgpUtilApi
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -191,7 +191,7 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
                         val result = pgpUtilApi.getKeyDescription(key)
 
-                        return listOf(result.length, result.emails, result.isPrivate)
+                        return arrayListOf(result.length, result.emails, result.isPrivate)
                     }
                     "createKeys" -> {
                         val length = (arg.next() as Number).toInt()
