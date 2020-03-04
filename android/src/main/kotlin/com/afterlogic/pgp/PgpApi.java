@@ -31,9 +31,9 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPSignatureList;
 import org.bouncycastle.openpgp.PGPUtil;
-import org.bouncycastle.openpgp.PGPV3SignatureGenerator;
 import org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
 import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import org.bouncycastle.openpgp.operator.bc.BcPBEDataDecryptorFactory;
@@ -174,13 +174,13 @@ public class PgpApi {
 
             PGPPrivateKey pgpPrivateKey = PgpUtilApi.getPrivateKey(privateKey, password);
 
-            PGPV3SignatureGenerator signatureGenerator = new PGPV3SignatureGenerator(
+            PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
                     new BcPGPContentSignerBuilder(
                             pgpPrivateKey.getPublicKeyPacket().getAlgorithm(),
-                            HashAlgorithmTags.SHA256
+                            HashAlgorithmTags.SHA512
                     )
             );
-            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, pgpPrivateKey);
+            signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, pgpPrivateKey);
             OutputStream armor = new ArmoredOutputStream(output);
             OutputStream stream = new BCPGOutputStream(armor);
 
