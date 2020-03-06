@@ -1,13 +1,13 @@
 package com.afterlogic.crypto_plugin
 
 import com.afterlogic.crypto_plugin.aes.Aes
-import com.afterlogic.pgp.PgpApi
-import com.afterlogic.pgp.PgpError
-import com.afterlogic.pgp.PgpUtilApi
-import com.afterlogic.pgp.platform_stream.PlatformInputStream
-import com.afterlogic.pgp.platform_stream.PlatformOutputStream
-import com.afterlogic.pgp.platform_stream.StreamCallback
-import com.afterlogic.pgp.platform_stream.StreamSink
+import lib.com.afterlogic.pgp.PgpApi
+import lib.com.afterlogic.pgp.PgpError
+import lib.com.afterlogic.pgp.PgpUtilApi
+import lib.com.afterlogic.pgp.platform_stream.PlatformInputStream
+import lib.com.afterlogic.pgp.platform_stream.PlatformOutputStream
+import lib.com.afterlogic.pgp.platform_stream.StreamCallback
+import lib.com.afterlogic.pgp.platform_stream.StreamSink
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

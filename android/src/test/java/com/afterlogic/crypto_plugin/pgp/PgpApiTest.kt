@@ -1,7 +1,7 @@
 package com.afterlogic.crypto_plugin.pgp
 
-import com.afterlogic.pgp.PgpApi
-import com.afterlogic.pgp.PgpUtilApi
+import lib.com.afterlogic.pgp.PgpApi
+import lib.com.afterlogic.pgp.PgpUtilApi
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -105,7 +105,7 @@ class PgpApiTest {
             var inputStream = ByteArrayInputStream(message.toByteArray())
             var outputStream = ByteArrayOutputStream()
             try {
-                pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
+                 pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
             } catch (e: Throwable) {
                 return TestResult(verify = false, decrypted = false, encrypted = false)
             }
