@@ -3,7 +3,7 @@ package lib.com.afterlogic.pgp.key.generation;
 
 
 
-import lib.com.afterlogic.pgp.key.collection.PGPKeyRing;
+import lib.com.afterlogic.pgp.key.collection.PGPKeyRingUtil;
 import lib.com.afterlogic.pgp.util.Passphrase;
 
 import lib.org.bouncycastle.openpgp.PGPException;
@@ -34,7 +34,7 @@ public interface KeyRingBuilderInterface {
 
     interface Build {
 
-        PGPKeyRing build() throws NoSuchAlgorithmException, PGPException,
+        PGPKeyRingUtil build() throws NoSuchAlgorithmException, PGPException,
                 InvalidAlgorithmParameterException;
 
     }

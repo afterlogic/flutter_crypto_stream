@@ -1,6 +1,7 @@
 package lib.com.afterlogic.pgp.encryption_signing;
 
 
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.org.bouncycastle.bcpg.ArmoredOutputStream;
 import lib.org.bouncycastle.bcpg.BCPGOutputStream;
 import lib.org.bouncycastle.openpgp.PGPCompressedDataGenerator;
@@ -16,7 +17,6 @@ import lib.org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import lib.org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
 import lib.org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 import lib.com.afterlogic.pgp.decryption_verification.OpenPgpMetadata;
 import lib.com.afterlogic.pgp.key.OpenPgpV4Fingerprint;
@@ -58,7 +58,7 @@ public final class EncryptionStream extends OutputStream {
                      Set<PGPPublicKey> encryptionKeys,
                      Set<PGPPrivateKey> signingKeys,
                      SymmetricKeyAlgorithm symmetricKeyAlgorithm,
-                     HashAlgorithm hashAlgorithm,
+                     HashAlgorithmUtil hashAlgorithmUtil,
                      CompressionAlgorithm compressionAlgorithm,
                      boolean asciiArmor)
             throws IOException, PGPException {
@@ -94,11 +94,11 @@ public final class EncryptionStream extends OutputStream {
         }
 
         if (!signingKeys.isEmpty()) {
-            LOGGER.log(LEVEL, "At least one signing key is available -> addSignature " + hashAlgorithm + " hash of message");
+            LOGGER.log(LEVEL, "At least one signing key is available -> addSignature " + hashAlgorithmUtil + " hash of message");
             for (PGPPrivateKey privateKey : signingKeys) {
                 LOGGER.log(LEVEL, "Sign using key " + Long.toHexString(privateKey.getKeyID()));
                 BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder(
-                        privateKey.getPublicKeyPacket().getAlgorithm(), hashAlgorithm.getAlgorithmId());
+                        privateKey.getPublicKeyPacket().getAlgorithm(), hashAlgorithmUtil.getAlgorithmId());
 
 
                 PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(contentSignerBuilder);

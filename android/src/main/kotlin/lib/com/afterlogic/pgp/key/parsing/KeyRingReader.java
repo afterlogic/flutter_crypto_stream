@@ -4,7 +4,7 @@ package lib.com.afterlogic.pgp.key.parsing;
 
 
 
-import lib.com.afterlogic.pgp.key.collection.PGPKeyRing;
+import lib.com.afterlogic.pgp.key.collection.PGPKeyRingUtil;
 
 import lib.org.bouncycastle.openpgp.PGPException;
 import lib.org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -74,18 +74,18 @@ public class KeyRingReader {
         return secretKeyRingCollection(asciiArmored.getBytes(UTF8));
     }
 
-    public PGPKeyRing keyRing(InputStream publicIn, InputStream secretIn) throws IOException, PGPException {
+    public PGPKeyRingUtil keyRing(InputStream publicIn, InputStream secretIn) throws IOException, PGPException {
         return readKeyRing(publicIn, secretIn);
     }
 
-    public PGPKeyRing keyRing(byte[] publicBytes, byte[] secretBytes) throws IOException, PGPException {
+    public PGPKeyRingUtil keyRing(byte[] publicBytes, byte[] secretBytes) throws IOException, PGPException {
         return keyRing(
                 publicBytes != null ? new ByteArrayInputStream(publicBytes) : null,
                 secretBytes != null ? new ByteArrayInputStream(secretBytes) : null
         );
     }
 
-    public PGPKeyRing keyRing(String asciiPublic, String asciiSecret) throws IOException, PGPException {
+    public PGPKeyRingUtil keyRing(String asciiPublic, String asciiSecret) throws IOException, PGPException {
         return keyRing(
                 asciiPublic != null ? asciiPublic.getBytes(UTF8) : null,
                 asciiSecret != null ? asciiSecret.getBytes(UTF8) : null
@@ -120,7 +120,7 @@ public class KeyRingReader {
                 new BcKeyFingerprintCalculator());
     }
 
-    public static PGPKeyRing readKeyRing(InputStream publicIn, InputStream secretIn) throws IOException, PGPException {
+    public static PGPKeyRingUtil readKeyRing(InputStream publicIn, InputStream secretIn) throws IOException, PGPException {
 
         if (publicIn == null && secretIn == null) {
             throw new NullPointerException("publicIn and secretIn cannot be BOTH null.");
@@ -136,13 +136,13 @@ public class KeyRingReader {
         }
 
         if (secretKeys == null) {
-            return new PGPKeyRing(publicKeys);
+            return new PGPKeyRingUtil(publicKeys);
         }
 
         if (publicKeys == null) {
-            return new PGPKeyRing(secretKeys);
+            return new PGPKeyRingUtil(secretKeys);
         }
 
-        return new PGPKeyRing(publicKeys, secretKeys);
+        return new PGPKeyRingUtil(publicKeys, secretKeys);
     }
 }

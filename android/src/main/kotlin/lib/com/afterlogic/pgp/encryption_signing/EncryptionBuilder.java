@@ -2,6 +2,7 @@
 package lib.com.afterlogic.pgp.encryption_signing;
 
 
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.org.bouncycastle.openpgp.PGPException;
 import lib.org.bouncycastle.openpgp.PGPPrivateKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKey;
@@ -11,7 +12,6 @@ import lib.org.bouncycastle.openpgp.PGPSecretKey;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 import lib.com.afterlogic.pgp.key.protection.SecretKeyRingProtector;
 import lib.com.afterlogic.pgp.key.selection.key.PublicKeySelectionStrategy;
@@ -37,7 +37,7 @@ public class EncryptionBuilder implements EncryptionBuilderInterface {
     private final Set<PGPSecretKey> signingKeys = new HashSet<>();
     private SecretKeyRingProtector signingKeysDecryptor;
     private SymmetricKeyAlgorithm symmetricKeyAlgorithm = SymmetricKeyAlgorithm.AES_128;
-    private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA256;
+    private HashAlgorithmUtil hashAlgorithmUtil = HashAlgorithmUtil.SHA256;
     private CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.UNCOMPRESSED;
     private boolean asciiArmor = false;
 
@@ -203,11 +203,11 @@ public class EncryptionBuilder implements EncryptionBuilderInterface {
 
         @Override
         public SignWith usingAlgorithms(SymmetricKeyAlgorithm symmetricKeyAlgorithm,
-                                        HashAlgorithm hashAlgorithm,
+                                        HashAlgorithmUtil hashAlgorithmUtil,
                                         CompressionAlgorithm compressionAlgorithm) {
 
             EncryptionBuilder.this.symmetricKeyAlgorithm = symmetricKeyAlgorithm;
-            EncryptionBuilder.this.hashAlgorithm = hashAlgorithm;
+            EncryptionBuilder.this.hashAlgorithmUtil = hashAlgorithmUtil;
             EncryptionBuilder.this.compressionAlgorithm = compressionAlgorithm;
 
             return new SignWithImpl();
@@ -216,7 +216,7 @@ public class EncryptionBuilder implements EncryptionBuilderInterface {
         @Override
         public SignWith usingSecureAlgorithms() {
             EncryptionBuilder.this.symmetricKeyAlgorithm = SymmetricKeyAlgorithm.AES_256;
-            EncryptionBuilder.this.hashAlgorithm = HashAlgorithm.SHA512;
+            EncryptionBuilder.this.hashAlgorithmUtil = HashAlgorithmUtil.SHA512;
             EncryptionBuilder.this.compressionAlgorithm = CompressionAlgorithm.UNCOMPRESSED;
 
             return new SignWithImpl();
@@ -315,7 +315,7 @@ public class EncryptionBuilder implements EncryptionBuilderInterface {
                     EncryptionBuilder.this.encryptionKeys,
                     privateKeys,
                     EncryptionBuilder.this.symmetricKeyAlgorithm,
-                    EncryptionBuilder.this.hashAlgorithm,
+                    EncryptionBuilder.this.hashAlgorithmUtil,
                     EncryptionBuilder.this.compressionAlgorithm,
                     EncryptionBuilder.this.asciiArmor);
         }

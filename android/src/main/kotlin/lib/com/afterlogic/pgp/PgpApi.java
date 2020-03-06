@@ -1,7 +1,7 @@
 package lib.com.afterlogic.pgp;
 
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 import lib.com.afterlogic.pgp.decryption_verification.DecryptionBuilder;
 import lib.com.afterlogic.pgp.decryption_verification.DecryptionBuilderInterface;
@@ -72,13 +72,13 @@ public class PgpApi {
             EncryptionBuilderInterface.SignWith signWith = toRecipients.toRecipients(PgpUtilApi.getPublicKeyRing(publicKeys))
                     .usingAlgorithms(
                             SymmetricKeyAlgorithm.AES_256,
-                            HashAlgorithm.SHA512,
+                            HashAlgorithmUtil.SHA512,
                             CompressionAlgorithm.ZIP
                     );
 
             EncryptionBuilderInterface.Armor armor;
             if (privateKey != null && password != null) {
-                KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.MD5, 0);
+                KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithmUtil.MD5, 0);
                 PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
                 PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
                     @Override
@@ -123,7 +123,7 @@ public class PgpApi {
 
             DecryptionBuilderInterface.DecryptWith decryptWith = new DecryptionBuilder().onInputStream(inputStream);
 
-            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.MD5, 0);
+            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithmUtil.MD5, 0);
             PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
             PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
                 @Override

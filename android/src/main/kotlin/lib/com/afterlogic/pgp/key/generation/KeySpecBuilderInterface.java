@@ -5,7 +5,7 @@ package lib.com.afterlogic.pgp.key.generation;
 
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.Feature;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.KeyFlag;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 
@@ -36,7 +36,7 @@ public interface KeySpecBuilderInterface {
 
     interface WithPreferredHashAlgorithms {
 
-        WithPreferredCompressionAlgorithms withPreferredHashAlgorithms(HashAlgorithm... algorithms);
+        WithPreferredCompressionAlgorithms withPreferredHashAlgorithms(HashAlgorithmUtil... algorithms);
 
         WithPreferredCompressionAlgorithms withDefaultHashAlgorithms();
 

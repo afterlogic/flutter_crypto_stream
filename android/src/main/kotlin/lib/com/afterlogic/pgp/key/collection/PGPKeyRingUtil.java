@@ -10,12 +10,12 @@ import lib.org.bouncycastle.openpgp.PGPPublicKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKeyRing;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
 
-public class PGPKeyRing {
+public class PGPKeyRingUtil {
 
     private PGPPublicKeyRing publicKeys;
     private PGPSecretKeyRing secretKeys;
 
-    public PGPKeyRing( PGPPublicKeyRing publicKeys,  PGPSecretKeyRing secretKeys) {
+    public PGPKeyRingUtil(PGPPublicKeyRing publicKeys, PGPSecretKeyRing secretKeys) {
 
         if (publicKeys.getPublicKey().getKeyID() != secretKeys.getPublicKey().getKeyID()) {
             throw new IllegalArgumentException("publicKeys and secretKeys must have the same master key.");
@@ -25,11 +25,11 @@ public class PGPKeyRing {
         this.secretKeys = secretKeys;
     }
 
-    public PGPKeyRing( PGPPublicKeyRing publicKeys) {
+    public PGPKeyRingUtil(PGPPublicKeyRing publicKeys) {
         this.publicKeys = publicKeys;
     }
 
-    public PGPKeyRing( PGPSecretKeyRing secretKeys) {
+    public PGPKeyRingUtil(PGPSecretKeyRing secretKeys) {
         this.secretKeys = secretKeys;
     }
 

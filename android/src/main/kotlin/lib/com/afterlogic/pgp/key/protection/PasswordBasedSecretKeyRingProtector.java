@@ -42,7 +42,7 @@ public class PasswordBasedSecretKeyRingProtector implements SecretKeyRingProtect
         Passphrase passphrase = passphraseProvider.getPassphraseFor(keyId);
         return new BcPBESecretKeyEncryptorBuilder(
                 protectionSettings.getEncryptionAlgorithm().getAlgorithmId(),
-                calculatorProvider.get(protectionSettings.getHashAlgorithm().getAlgorithmId()),
+                calculatorProvider.get(protectionSettings.getHashAlgorithmUtil().getAlgorithmId()),
                 protectionSettings.getS2kCount())
                 .build(passphrase != null ? passphrase.getChars() : null);
     }

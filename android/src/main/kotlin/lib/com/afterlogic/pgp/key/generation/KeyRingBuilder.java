@@ -2,9 +2,9 @@
 package lib.com.afterlogic.pgp.key.generation;
 
 
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.KeyFlag;
-import lib.com.afterlogic.pgp.key.collection.PGPKeyRing;
+import lib.com.afterlogic.pgp.key.collection.PGPKeyRingUtil;
 import lib.com.afterlogic.pgp.key.generation.type.ECDH;
 import lib.com.afterlogic.pgp.key.generation.type.ECDSA;
 import lib.com.afterlogic.pgp.key.generation.type.KeyType;
@@ -48,7 +48,7 @@ public class KeyRingBuilder implements KeyRingBuilderInterface {
     private Passphrase passphrase;
 
 
-    public PGPKeyRing simpleRsaKeyRing(String userId, RsaLength length)
+    public PGPKeyRingUtil simpleRsaKeyRing(String userId, RsaLength length)
             throws PGPException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         return withMasterKey(
                 KeySpec.getBuilder(RSA_GENERAL.withLength(length))
@@ -60,7 +60,7 @@ public class KeyRingBuilder implements KeyRingBuilderInterface {
     }
 
 
-    public PGPKeyRing simpleEcKeyRing(String userId)
+    public PGPKeyRingUtil simpleEcKeyRing(String userId)
             throws PGPException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         return withSubKey(
                 KeySpec.getBuilder(ECDH.fromCurve(EllipticCurve._P256))
@@ -121,12 +121,12 @@ public class KeyRingBuilder implements KeyRingBuilderInterface {
         class BuildImpl implements Build {
 
             @Override
-            public PGPKeyRing build() throws NoSuchAlgorithmException, PGPException,
+            public PGPKeyRingUtil build() throws NoSuchAlgorithmException, PGPException,
                     InvalidAlgorithmParameterException {
 
                                 PGPDigestCalculator calculator = new JcaPGPDigestCalculatorProviderBuilder()
                         .build()
-                        .get(HashAlgorithm.SHA1.getAlgorithmId());
+                        .get(HashAlgorithmUtil.SHA1.getAlgorithmId());
 
                                 PBESecretKeyEncryptor encryptor = passphrase == null ?
                         null : // unencrypted key pair, otherwise AES-256 encrypted
@@ -143,7 +143,7 @@ public class KeyRingBuilder implements KeyRingBuilderInterface {
                                 PGPKeyPair certKey = generateKeyPair(certKeySpec);
 
                                 PGPContentSignerBuilder signer = new JcaPGPContentSignerBuilder(
-                        certKey.getPublicKey().getAlgorithm(), HashAlgorithm.SHA512.getAlgorithmId());
+                        certKey.getPublicKey().getAlgorithm(), HashAlgorithmUtil.SHA512.getAlgorithmId());
 
                 PGPSignatureSubpacketVector hashedSubPackets = certKeySpec.getSubpackets();
 
@@ -164,7 +164,7 @@ public class KeyRingBuilder implements KeyRingBuilderInterface {
                 PGPPublicKeyRing publicKeys = ringGenerator.generatePublicKeyRing();
                 PGPSecretKeyRing secretKeys = ringGenerator.generateSecretKeyRing();
 
-                return new PGPKeyRing(publicKeys, secretKeys);
+                return new PGPKeyRingUtil(publicKeys, secretKeys);
             }
 
             private PGPKeyPair generateKeyPair(KeySpec spec)

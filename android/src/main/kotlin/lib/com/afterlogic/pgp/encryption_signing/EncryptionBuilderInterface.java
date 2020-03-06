@@ -3,7 +3,7 @@ package lib.com.afterlogic.pgp.encryption_signing;
 
 
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 import lib.com.afterlogic.pgp.exception.SecretKeyNotFoundException;
 import lib.com.afterlogic.pgp.key.protection.SecretKeyRingProtector;
@@ -53,7 +53,7 @@ public interface EncryptionBuilderInterface {
                                      MultiMap<O, PGPPublicKeyRingCollection> keys);
 
         SignWith usingAlgorithms(SymmetricKeyAlgorithm symmetricKeyAlgorithm,
-                                 HashAlgorithm hashAlgorithm,
+                                 HashAlgorithmUtil hashAlgorithmUtil,
                                  CompressionAlgorithm compressionAlgorithm);
 
         SignWith usingSecureAlgorithms();

@@ -10,7 +10,7 @@ import lib.org.bouncycastle.openpgp.PGPSignatureSubpacketGenerator;
 import lib.com.afterlogic.pgp.algorithm.AlgorithmSuite;
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.Feature;
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.KeyFlag;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 
@@ -105,7 +105,7 @@ public class KeySpecBuilder implements KeySpecBuilderInterface {
     class WithPreferredHashAlgorithmsImpl implements WithPreferredHashAlgorithms {
 
         @Override
-        public WithPreferredCompressionAlgorithms withPreferredHashAlgorithms( HashAlgorithm... algorithms) {
+        public WithPreferredCompressionAlgorithms withPreferredHashAlgorithms( HashAlgorithmUtil... algorithms) {
             int[] ids = new int[algorithms.length];
             for (int i = 0; i < ids.length; i++) {
                 ids[i] = algorithms[i].getAlgorithmId();

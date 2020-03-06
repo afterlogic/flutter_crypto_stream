@@ -1,8 +1,8 @@
 package lib.com.afterlogic.pgp;
 
-import lib.com.afterlogic.pgp.algorithm.HashAlgorithm;
+import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
-import lib.com.afterlogic.pgp.key.collection.PGPKeyRing;
+import lib.com.afterlogic.pgp.key.collection.PGPKeyRingUtil;
 import lib.com.afterlogic.pgp.key.generation.KeyRingBuilder;
 import lib.com.afterlogic.pgp.key.generation.KeySpec;
 import lib.com.afterlogic.pgp.key.generation.type.RSA_GENERAL;
@@ -78,7 +78,7 @@ public class PgpUtilApi {
             rsaLength = RsaLength._4096;
 
 
-        PGPKeyRing keyRing = new KeyRingBuilder().withMasterKey(
+        PGPKeyRingUtil keyRing = new KeyRingBuilder().withMasterKey(
                 KeySpec.getBuilder(RSA_GENERAL.withLength(rsaLength))
                         .withDefaultKeyFlags()
                         .withDefaultAlgorithms())
@@ -111,7 +111,7 @@ public class PgpUtilApi {
     static PGPPrivateKey getPrivateKey(String privateKey, final String password) throws PgpError {
         try {
 
-            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithm.MD5, 0);
+            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithmUtil.MD5, 0);
             PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
             PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
                 @Override

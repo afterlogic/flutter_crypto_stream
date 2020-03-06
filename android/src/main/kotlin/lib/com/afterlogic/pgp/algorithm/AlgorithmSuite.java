@@ -14,10 +14,10 @@ public class AlgorithmSuite {
                     SymmetricKeyAlgorithm.AES_192,
                     SymmetricKeyAlgorithm.AES_128),
             Arrays.asList(
-                    HashAlgorithm.SHA512,
-                    HashAlgorithm.SHA384,
-                    HashAlgorithm.SHA256,
-                    HashAlgorithm.SHA224),
+                    HashAlgorithmUtil.SHA512,
+                    HashAlgorithmUtil.SHA384,
+                    HashAlgorithmUtil.SHA256,
+                    HashAlgorithmUtil.SHA224),
             Arrays.asList(
                     CompressionAlgorithm.ZLIB,
                     CompressionAlgorithm.BZIP2,
@@ -26,14 +26,14 @@ public class AlgorithmSuite {
     );
 
     private List<SymmetricKeyAlgorithm> symmetricKeyAlgorithms;
-    private List<HashAlgorithm> hashAlgorithms;
+    private List<HashAlgorithmUtil> hashAlgorithmUtils;
     private List<CompressionAlgorithm> compressionAlgorithms;
 
     public  AlgorithmSuite(List<SymmetricKeyAlgorithm> symmetricKeyAlgorithms,
-                          List<HashAlgorithm> hashAlgorithms,
+                          List<HashAlgorithmUtil> hashAlgorithmUtils,
                           List<CompressionAlgorithm> compressionAlgorithms) {
         this.symmetricKeyAlgorithms = Collections.unmodifiableList(symmetricKeyAlgorithms);
-        this.hashAlgorithms = Collections.unmodifiableList(hashAlgorithms);
+        this.hashAlgorithmUtils = Collections.unmodifiableList(hashAlgorithmUtils);
         this.compressionAlgorithms = Collections.unmodifiableList(compressionAlgorithms);
     }
 
@@ -53,18 +53,18 @@ public class AlgorithmSuite {
         return array;
     }
 
-    public void setHashAlgorithms(List<HashAlgorithm> hashAlgorithms) {
-        this.hashAlgorithms = hashAlgorithms;
+    public void setHashAlgorithmUtils(List<HashAlgorithmUtil> hashAlgorithmUtils) {
+        this.hashAlgorithmUtils = hashAlgorithmUtils;
     }
 
-    public List<HashAlgorithm> getHashAlgorithms() {
-        return hashAlgorithms;
+    public List<HashAlgorithmUtil> getHashAlgorithmUtils() {
+        return hashAlgorithmUtils;
     }
 
     public int[] getHashAlgorithmIds() {
-        int[] array = new int[hashAlgorithms.size()];
+        int[] array = new int[hashAlgorithmUtils.size()];
         for (int i = 0; i < array.length; i++) {
-            array[i] = hashAlgorithms.get(i).getAlgorithmId();
+            array[i] = hashAlgorithmUtils.get(i).getAlgorithmId();
         }
         return array;
     }

@@ -6,7 +6,7 @@ import lib.org.bouncycastle.bcpg.HashAlgorithmTags;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum HashAlgorithm {
+public enum HashAlgorithmUtil {
 
     MD5(HashAlgorithmTags.MD5),
     SHA1(HashAlgorithmTags.SHA1),
@@ -20,21 +20,21 @@ public enum HashAlgorithm {
     SHA512(HashAlgorithmTags.SHA512),
     SHA224(HashAlgorithmTags.SHA224),
     ;
-    private static final Map<Integer, HashAlgorithm> MAP = new HashMap<>();
+    private static final Map<Integer, HashAlgorithmUtil> MAP = new HashMap<>();
 
     static {
-        for (HashAlgorithm h : HashAlgorithm.values()) {
+        for (HashAlgorithmUtil h : HashAlgorithmUtil.values()) {
             MAP.put(h.algorithmId, h);
         }
     }
 
-    public static HashAlgorithm fromId(int id) {
+    public static HashAlgorithmUtil fromId(int id) {
         return MAP.get(id);
     }
 
     private final int algorithmId;
 
-    HashAlgorithm(int id) {
+    HashAlgorithmUtil(int id) {
         this.algorithmId = id;
     }
 

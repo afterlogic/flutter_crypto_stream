@@ -1178,7 +1178,7 @@ public class TlsUtils
         case HashAlgorithm.sha512:
             return new SHA512Digest();
         default:
-            throw new IllegalArgumentException("unknown HashAlgorithm");
+            throw new IllegalArgumentException("unknown HashAlgorithmUtil");
         }
     }
 
@@ -1206,7 +1206,7 @@ public class TlsUtils
         case HashAlgorithm.sha512:
             return new SHA512Digest((SHA512Digest)hash);
         default:
-            throw new IllegalArgumentException("unknown HashAlgorithm");
+            throw new IllegalArgumentException("unknown HashAlgorithmUtil");
         }
     }
 
@@ -1264,7 +1264,7 @@ public class TlsUtils
         case HashAlgorithm.sha512:
             return NISTObjectIdentifiers.id_sha512;
         default:
-            throw new IllegalArgumentException("unknown HashAlgorithm");
+            throw new IllegalArgumentException("unknown HashAlgorithmUtil");
         }
     }
 
@@ -1353,7 +1353,7 @@ public class TlsUtils
                 {
                     handshakeHash.trackHashAlgorithm(hashAlgorithm);
                 }
-                else //if (HashAlgorithm.isPrivate(hashAlgorithm))
+                else //if (HashAlgorithmUtil.isPrivate(hashAlgorithm))
                 {
                     // TODO Support values in the "Reserved for Private Use" range
                 }
