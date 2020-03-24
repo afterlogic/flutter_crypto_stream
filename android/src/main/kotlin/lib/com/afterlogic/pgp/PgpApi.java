@@ -138,19 +138,17 @@ public class PgpApi {
             );
 
             DecryptionBuilderInterface.Build build;
-            if (publicKeys != null && publicKeys.length != 0) {
 
-                build = verifyWith.verifyWith(PgpUtilApi.getPublicKeyRing(publicKeys))
-                        .handleMissingPublicKeysWith(new MissingPublicKeyCallback() {
-                            @Override
-                            public PGPPublicKey onMissingPublicKeyEncountered(Long keyId) {
-                                lastVerifyResult = false;
-                                return null;
-                            }
-                        });
-            } else {
-                build = verifyWith.doNotVerify();
-            }
+
+            build = verifyWith.verifyWith(PgpUtilApi.getPublicKeyRing(publicKeys))
+                    .handleMissingPublicKeysWith(new MissingPublicKeyCallback() {
+                        @Override
+                        public PGPPublicKey onMissingPublicKeyEncountered(Long keyId) {
+                            lastVerifyResult = false;
+                            return null;
+                        }
+                    });
+
 
             InputStream decryptionStream = build.build();
             Streams.pipeAll(decryptionStream, outputStream);
@@ -303,6 +301,7 @@ public class PgpApi {
 
             SymmetricKeyAlgorithm encryptionAlgorithm = SymmetricKeyAlgorithm.AES_256;
             CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.ZIP;
+            OutputStream armorOut = new ArmoredOutputStream(outputStream);
             Passphrase passphrase = new Passphrase(password.toCharArray());
 
             compress(inputStream, new FileOutputStream(prepareEncrypt), compressionAlgorithm.getAlgorithmId(), length);
@@ -319,7 +318,7 @@ public class PgpApi {
                             .setSecureRandom(new SecureRandom())
             );
 
-            OutputStream encOut = encGen.open(outputStream, prepareEncrypt.length());
+            OutputStream encOut = encGen.open(armorOut, prepareEncrypt.length());
 
             Streams.pipeAll(preparedInputStream, encOut);
 
@@ -330,6 +329,7 @@ public class PgpApi {
             encOut.close();
             preparedInputStream.close();
             inputStream.close();
+            armorOut.close();
             outputStream.close();
         } catch (Throwable e) {
             if (e instanceof PgpError) {

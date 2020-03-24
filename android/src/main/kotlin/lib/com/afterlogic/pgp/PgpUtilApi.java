@@ -134,11 +134,14 @@ public class PgpUtilApi {
 
     static PGPPublicKeyRingCollection getPublicKeyRing(String[] publicKeys) throws PgpError {
         try {
-            PGPPublicKeyRing[] publicKeyRings = new PGPPublicKeyRing[publicKeys.length];
-            int i = 0;
-            for (String publicKey : publicKeys) {
-                publicKeyRings[i] = KeyRingReader.readPublicKeyRing(new ByteArrayInputStream(publicKey.getBytes()));
-                i++;
+            int length = publicKeys == null ? 0 : publicKeys.length;
+            PGPPublicKeyRing[] publicKeyRings = new PGPPublicKeyRing[length];
+            if (publicKeys != null) {
+                int i = 0;
+                for (String publicKey : publicKeys) {
+                    publicKeyRings[i] = KeyRingReader.readPublicKeyRing(new ByteArrayInputStream(publicKey.getBytes()));
+                    i++;
+                }
             }
             return new PGPPublicKeyRingCollection(Arrays.asList(publicKeyRings));
         } catch (Throwable e) {

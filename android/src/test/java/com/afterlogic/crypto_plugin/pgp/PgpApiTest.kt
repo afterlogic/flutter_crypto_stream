@@ -39,6 +39,22 @@ class PgpApiTest {
     }
 
     @Test
+    fun invalidSign() {
+        val message = "message!"
+        val pgp = PgpApi()
+        var inputStream = ByteArrayInputStream(message.toByteArray())
+        var outputStream = ByteArrayOutputStream()
+
+        pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
+
+        inputStream = ByteArrayInputStream(outputStream.toByteArray())
+        outputStream = ByteArrayOutputStream()
+        pgp.decrypt(privateKey, arrayOf(otherPublicKey), password, inputStream, outputStream)
+
+        assert(message == outputStream.toByteArray().toString(Charsets.UTF_8) && !pgp.lastVerifyResult)
+    }
+
+    @Test
     fun util() {
         val pgpUtilApi = PgpUtilApi()
         val email = "test@test.com"
@@ -105,7 +121,7 @@ class PgpApiTest {
             var inputStream = ByteArrayInputStream(message.toByteArray())
             var outputStream = ByteArrayOutputStream()
             try {
-                 pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
+                pgp.encrypt(privateKey, arrayOf(publicKey), password, inputStream, outputStream)
             } catch (e: Throwable) {
                 return TestResult(verify = false, decrypted = false, encrypted = false)
             }
