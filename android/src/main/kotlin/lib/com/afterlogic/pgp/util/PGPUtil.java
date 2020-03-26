@@ -18,7 +18,6 @@ import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSignature;
 import lib.org.bouncycastle.openpgp.PGPSignatureSubpacketVector;
-import lib.org.bouncycastle.openpgp.PGPUtil;
 import lib.org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import lib.org.bouncycastle.util.io.Streams;
 import lib.com.afterlogic.pgp.algorithm.KeyFlag;
@@ -34,9 +33,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BCUtil {
+public class PGPUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(BCUtil.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PGPUtil.class.getName());
 
 
     public static PGPPublicKeyRingCollection keyRingsToKeyRingCollection( PGPPublicKeyRing... rings)
@@ -100,7 +99,7 @@ public class BCUtil {
 
     public static InputStream getPgpDecoderInputStream( InputStream inputStream)
             throws IOException {
-        return PGPUtil.getDecoderStream(inputStream);
+        return lib.org.bouncycastle.openpgp.PGPUtil.getDecoderStream(inputStream);
     }
 
     public static byte[] getDecodedBytes( byte[] bytes)

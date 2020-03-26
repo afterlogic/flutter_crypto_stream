@@ -12,7 +12,7 @@ import lib.com.afterlogic.pgp.key.parsing.KeyRingReader;
 import lib.com.afterlogic.pgp.key.protection.KeyRingProtectionSettings;
 import lib.com.afterlogic.pgp.key.protection.PasswordBasedSecretKeyRingProtector;
 import lib.com.afterlogic.pgp.key.protection.SecretKeyPassphraseProvider;
-import lib.com.afterlogic.pgp.util.BCUtil;
+import lib.com.afterlogic.pgp.util.PGPUtil;
 import lib.com.afterlogic.pgp.util.Passphrase;
 
 import lib.org.bouncycastle.bcpg.ArmoredOutputStream;
@@ -34,7 +34,6 @@ import lib.org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSignature;
 import lib.org.bouncycastle.openpgp.PGPSignatureGenerator;
 import lib.org.bouncycastle.openpgp.PGPSignatureList;
-import lib.org.bouncycastle.openpgp.PGPUtil;
 import lib.org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
 import lib.org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import lib.org.bouncycastle.openpgp.operator.bc.BcPBEDataDecryptorFactory;
@@ -133,7 +132,7 @@ public class PgpApi {
                 }
             });
 
-            PGPSecretKeyRingCollection secretKeyRings = BCUtil.keyRingsToKeyRingCollection(secretKeys);
+            PGPSecretKeyRingCollection secretKeyRings = PGPUtil.keyRingsToKeyRingCollection(secretKeys);
 
             DecryptionBuilderInterface.VerifyWith verifyWith = decryptWith.decryptWith(
                     secretKeyRingProtector,
@@ -252,7 +251,7 @@ public class PgpApi {
 
 
             try {
-                InputStream decoderStream = PGPUtil.getDecoderStream(signature);
+                InputStream decoderStream = lib.org.bouncycastle.openpgp.PGPUtil.getDecoderStream(signature);
 
                 PGPPublicKeyRingCollection pgpPublicKeyRingCollection = PgpUtilApi.getPublicKeyRing(publicKeys);
 
@@ -367,7 +366,7 @@ public class PgpApi {
             Passphrase passphrase = new Passphrase(password.toCharArray());
             PGPPBEEncryptedData pbe;
 
-            InputStream decoderInput = PGPUtil.getDecoderStream(inputStream);
+            InputStream decoderInput = lib.org.bouncycastle.openpgp.PGPUtil.getDecoderStream(inputStream);
 
             BcPGPObjectFactory pgpF = new BcPGPObjectFactory(decoderInput);
             PGPEncryptedDataList enc;
