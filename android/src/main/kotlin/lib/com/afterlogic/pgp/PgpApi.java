@@ -12,7 +12,7 @@ import lib.com.afterlogic.pgp.key.parsing.KeyRingReader;
 import lib.com.afterlogic.pgp.key.protection.KeyRingProtectionSettings;
 import lib.com.afterlogic.pgp.key.protection.PasswordBasedSecretKeyRingProtector;
 import lib.com.afterlogic.pgp.key.protection.SecretKeyPassphraseProvider;
-import lib.com.afterlogic.pgp.util.PGPUtil;
+import lib.com.afterlogic.pgp.util.NewPGPUtil;
 import lib.com.afterlogic.pgp.util.Passphrase;
 
 import lib.org.bouncycastle.bcpg.ArmoredOutputStream;
@@ -132,7 +132,7 @@ public class PgpApi {
                 }
             });
 
-            PGPSecretKeyRingCollection secretKeyRings = PGPUtil.keyRingsToKeyRingCollection(secretKeys);
+            PGPSecretKeyRingCollection secretKeyRings = NewPGPUtil.keyRingsToKeyRingCollection(secretKeys);
 
             DecryptionBuilderInterface.VerifyWith verifyWith = decryptWith.decryptWith(
                     secretKeyRingProtector,

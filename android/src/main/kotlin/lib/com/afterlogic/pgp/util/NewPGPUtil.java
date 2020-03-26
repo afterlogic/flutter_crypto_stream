@@ -33,9 +33,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PGPUtil {
+public class NewPGPUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(PGPUtil.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NewPGPUtil.class.getName());
 
 
     public static PGPPublicKeyRingCollection keyRingsToKeyRingCollection( PGPPublicKeyRing... rings)
