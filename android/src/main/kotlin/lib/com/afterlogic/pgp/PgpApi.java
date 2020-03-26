@@ -30,6 +30,7 @@ import lib.org.bouncycastle.openpgp.PGPPrivateKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
+import lib.org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSignature;
 import lib.org.bouncycastle.openpgp.PGPSignatureGenerator;
 import lib.org.bouncycastle.openpgp.PGPSignatureList;
@@ -132,9 +133,11 @@ public class PgpApi {
                 }
             });
 
+            PGPSecretKeyRingCollection secretKeyRings = BCUtil.keyRingsToKeyRingCollection(secretKeys);
+
             DecryptionBuilderInterface.VerifyWith verifyWith = decryptWith.decryptWith(
                     secretKeyRingProtector,
-                    BCUtil.keyRingsToKeyRingCollection(secretKeys)
+                    secretKeyRings
             );
 
             DecryptionBuilderInterface.Build build;
