@@ -155,7 +155,6 @@ public class PgpApi {
                         }
                     });
 
-
             InputStream decryptionStream = build.build();
             Streams.pipeAll(decryptionStream, outputStream);
             decryptionStream.close();
