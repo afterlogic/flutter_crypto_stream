@@ -1,0 +1,35 @@
+PODS:
+  - crypto_plugin (0.0.1):
+    - Flutter
+    - RxSwift (~> 5)
+  - Flutter (1.0.0)
+  - path_provider (0.0.1):
+    - Flutter
+  - RxSwift (5.0.1)
+
+DEPENDENCIES:
+  - crypto_plugin (from `.symlinks/plugins/crypto_plugin/ios`)
+  - Flutter (from `Flutter`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+
+SPEC REPOS:
+  trunk:
+    - RxSwift
+
+EXTERNAL SOURCES:
+  crypto_plugin:
+    :path: ".symlinks/plugins/crypto_plugin/ios"
+  Flutter:
+    :path: Flutter
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+
+SPEC CHECKSUMS:
+  crypto_plugin: cd0081d902ef5e1c6a3cac4f7ec855fdde3ddd4d
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
+  RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
+
+PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+
+COCOAPODS: 1.8.4

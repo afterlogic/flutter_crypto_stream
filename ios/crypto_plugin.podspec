@@ -15,7 +15,16 @@ A new Flutter project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.static_framework = true
   s.ios.deployment_target = '8.0'
+
+  s.xcconfig = { 
+    'LIBRARY_SEARCH_PATHS' => '../dist/lib',
+    'HEADER_SEARCH_PATHS' => '../dist/frameworks/JRE.framework/Headers',
+  }
+
+  s.libraries = 'jre_emul', 'z', 'iconv'
+
+  s.static_framework = true
+  s.dependency 'RxSwift', '~> 5'
 end
 
