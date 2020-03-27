@@ -59,6 +59,10 @@ public class PgpApi {
     public boolean lastVerifyResult = true;
     final BcPGPDigestCalculatorProvider digestCalculator = new BcPGPDigestCalculatorProvider();
 
+    public boolean getLastVerifyResult() {
+        return lastVerifyResult;
+    }
+
     public void encrypt(
             String privateKey,
             String[] publicKeys,
