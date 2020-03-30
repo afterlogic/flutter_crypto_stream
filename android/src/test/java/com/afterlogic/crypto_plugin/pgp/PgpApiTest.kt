@@ -32,7 +32,7 @@ class PgpApiTest {
         assert(result.verify && result.decrypted)
 
         result = signVerifyMessage("test", privateKey, otherPublicKey, password)
-        assert(!result.verify)
+        assert(!result.verify && result.decrypted)
 
         result = signVerifyMessage("test", privateKey, publicKey, password + "1")
         assert(!result.encrypted)
@@ -75,7 +75,7 @@ class PgpApiTest {
         result = symmetrically("test\r\n", "1112", "1112")
         assert(result.decrypted)
         result = symmetrically("test", "1111", "131")
-        assert(!result.decrypted)
+        assert(!result.decrypted && result.encrypted)
     }
 
     private fun symmetrically(message: String, password: String, decryptPassword: String): TestResult {
@@ -141,7 +141,7 @@ class PgpApiTest {
 
 
     companion object {
-        const val testFile = "C:\\Users\\NyAkovlev\\Downloads\\test.bmp"
+        const val testFile = "D:\\file.txt"
 
 
         const val testEncrypt = "$testFile.gpg"

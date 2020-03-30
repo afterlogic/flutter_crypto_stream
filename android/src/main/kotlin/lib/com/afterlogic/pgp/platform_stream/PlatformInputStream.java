@@ -1,11 +1,12 @@
 package lib.com.afterlogic.pgp.platform_stream;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 
 public class PlatformInputStream extends InputStream {
     private boolean isClosed = false;
-    private int bufferSize = 0;
     private byte[] buffer = new byte[0];
     private int position = 0;
     private final StreamCallback endBufferCallback;
@@ -17,7 +18,6 @@ public class PlatformInputStream extends InputStream {
 
     public void addBuffer(byte[] buffer) {
         this.buffer = buffer;
-        bufferSize = buffer.length;
         position = 0;
         if (buffer.length == 1 && buffer[0] == -1) {
             close();
@@ -25,6 +25,36 @@ public class PlatformInputStream extends InputStream {
         if (countDownLatch != null) {
             countDownLatch.countDown();
         }
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (off > 0) {
+            readBuffer(null, off);
+        }
+        return readBuffer(b, len);
+    }
+
+    private int readBuffer(byte[] output, final int size) {
+        int outPos = 0;
+        while (outPos < size) {
+            if (isClosed) {
+                if (outPos == 0) {
+                    return -1;
+                }
+                return outPos;
+            }
+            int len = Math.min(size - outPos, buffer.length - position);
+            if (output != null) {
+                System.arraycopy(buffer, position, output, outPos, len);
+            }
+            outPos += len;
+            position += len;
+            if (position >= buffer.length) {
+                pause();
+            }
+        }
+        return outPos;
     }
 
     @Override
