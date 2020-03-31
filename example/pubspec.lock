@@ -57,7 +57,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.3"
-  crypto_plugin:
+  crypto_stream:
     dependency: "direct main"
     description:
       path: ".."

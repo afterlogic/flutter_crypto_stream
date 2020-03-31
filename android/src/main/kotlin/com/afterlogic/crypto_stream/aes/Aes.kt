@@ -1,4 +1,4 @@
-package com.afterlogic.crypto_plugin.aes
+package com.afterlogic.crypto_stream.aes
 
 import lib.org.bouncycastle.util.encoders.Base64
 import javax.crypto.Cipher

@@ -1,4 +1,4 @@
-package com.afterlogic.crypto_plugin.pgp
+package com.afterlogic.crypto_stream.pgp
 
 import lib.com.afterlogic.pgp.PgpApi
 import lib.com.afterlogic.pgp.PgpUtilApi

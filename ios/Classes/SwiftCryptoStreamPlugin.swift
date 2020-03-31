@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import RxSwift
 
-public class SwiftCryptoPlugin: NSObject, FlutterPlugin,FlutterStreamHandler {
+public class SwiftCryptoStreamPlugin: NSObject, FlutterPlugin,FlutterStreamHandler {
     var methodCallHandler : FlutterMethodCallHandler?
     let pgpApi = LibComAfterlogicPgpPgpApi()
     let pgpUtilApi = LibComAfterlogicPgpPgpUtilApi()
@@ -229,7 +229,7 @@ public class SwiftCryptoPlugin: NSObject, FlutterPlugin,FlutterStreamHandler {
         let messanger = registrar.messenger()
         let channel = FlutterMethodChannel(name: "crypto_method", binaryMessenger: messanger)
         let event = FlutterEventChannel(name: "crypto_event", binaryMessenger: messanger)
-        let plugin = SwiftCryptoPlugin()
+        let plugin = SwiftCryptoStreamPlugin()
         event.setStreamHandler(plugin)
         channel.setMethodCallHandler(plugin.methodCallHandler)
     }

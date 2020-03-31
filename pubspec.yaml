@@ -1,4 +1,4 @@
-name: crypto_plugin
+name: crypto_stream
 description: A new flutter plugin project.
 version: 0.0.1
 author:
@@ -16,8 +16,8 @@ dev_dependencies:
 
 flutter:
   plugin:
-    androidPackage: com.afterlogic.crypto_plugin
-    pluginClass: CryptoPlugin
+    androidPackage: com.afterlogic.crypto_stream
+    pluginClass: crypto_stream
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

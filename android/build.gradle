@@ -1,4 +1,4 @@
-group 'com.privaterouter.crypto_plugin'
+group 'com.privaterouter.crypto_stream'
 version '1.0-SNAPSHOT'
 
 buildscript {

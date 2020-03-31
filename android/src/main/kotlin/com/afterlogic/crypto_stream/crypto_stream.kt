@@ -1,6 +1,6 @@
-package com.afterlogic.crypto_plugin
+package com.afterlogic.crypto_stream
 
-import com.afterlogic.crypto_plugin.aes.Aes
+import com.afterlogic.crypto_stream.aes.Aes
 import lib.com.afterlogic.pgp.PgpApi
 import lib.com.afterlogic.pgp.PgpError
 import lib.com.afterlogic.pgp.PgpUtilApi
@@ -23,7 +23,7 @@ import io.reactivex.internal.schedulers.SingleScheduler
 import io.reactivex.subjects.BehaviorSubject
 import java.io.File
 
-class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
+class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
     private val executionScheduler: Scheduler = SingleScheduler()
     private val disposable = CompositeDisposable()
@@ -235,7 +235,7 @@ class CryptoPlugin : MethodCallHandler, EventChannel.StreamHandler {
         fun registerWith(registrar: Registrar) {
             val channel = MethodChannel(registrar.messenger(), "crypto_method")
             val event = EventChannel(registrar.messenger(), "crypto_event")
-            val plugin = CryptoPlugin()
+            val plugin = crypto_stream()
             event.setStreamHandler(plugin)
             channel.setMethodCallHandler(plugin)
 
