@@ -116,6 +116,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     outByte = List<int>();
     pgp.encrypt(null, [publicKey], password).listen((data) {
       outByte.addAll(data);
+    }, onError: (e, s) {
+      print(s);
+      outText = "$e\n\n\n$s";
     }).onDone(() {
       outText = String.fromCharCodes(outByte);
       setState(() {});
@@ -126,11 +129,12 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(currentBytes
-            .getRange(i * step, min((i + 1) * step, currentBytes.length))
-            .toList());
+        await platformSink.add(
+            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
       }
-    } catch (e) {}
+    } catch (e, s) {
+      print(s);
+    }
     await platformSink.close();
   }
 
@@ -139,6 +143,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     outByte = List<int>();
     pgp.decrypt(privateKey, null, password).listen((data) {
       outByte.addAll(data);
+    }, onError: (e, s) {
+      print(s);
+      outText = "$e\n\n\n$s";
     }).onDone(() {
       outText = String.fromCharCodes(outByte);
       setState(() {});
@@ -149,11 +156,12 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(currentBytes
-            .getRange(i * step, min((i + 1) * step, currentBytes.length))
-            .toList());
+        await platformSink.add(
+            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
       }
-    } catch (e) {}
+    } catch (e, s) {
+      print(s);
+    }
     await platformSink.close();
   }
 
@@ -163,14 +171,16 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     if (await tempFile.exists()) {
       await tempFile.delete();
     }
-    await tempFile.create();
 
-    var currentBytes = outByte;
+    var currentBytes = textCtrl.text.codeUnits;
     outByte = List<int>();
     pgp.symmetricallyEncrypt(tempFile, password, currentBytes.length).listen(
       (data) {
         outByte.addAll(data);
-      },
+      }, onError: (e, s) {
+      print(s);
+      outText = "$e\n\n\n$s";
+    }
     ).onDone(
       () {
         outText = String.fromCharCodes(outByte);
@@ -183,11 +193,12 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(currentBytes
-            .getRange(i * step, min((i + 1) * step, currentBytes.length))
-            .toList());
+        await platformSink.add(
+            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
       }
-    } catch (e) {}
+    } catch (e, s) {
+      print(s);
+    }
     await platformSink.close();
   }
 
@@ -197,7 +208,10 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     pgp.symmetricallyDecrypt(password).listen(
       (data) {
         outByte.addAll(data);
-      },
+      }, onError: (e, s) {
+      print(s);
+      outText = "$e\n\n\n$s";
+    }
     ).onDone(
       () {
         outText = String.fromCharCodes(outByte);
@@ -210,11 +224,12 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(currentBytes
-            .getRange(i * step, min((i + 1) * step, currentBytes.length))
-            .toList());
+        await platformSink.add(
+            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
       }
-    } catch (e) {}
+    } catch (e, s) {
+      print(s);
+    }
     await platformSink.close();
   }
 

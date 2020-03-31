@@ -1,8 +1,12 @@
 PODS:
   - crypto_plugin (0.0.1):
     - Flutter
+    - OpenSSL-Universal (~> 1.0.2.17)
     - RxSwift (~> 5)
   - Flutter (1.0.0)
+  - OpenSSL-Universal (1.0.2.19):
+    - OpenSSL-Universal/Static (= 1.0.2.19)
+  - OpenSSL-Universal/Static (1.0.2.19)
   - path_provider (0.0.1):
     - Flutter
   - RxSwift (5.0.1)
@@ -14,6 +18,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - OpenSSL-Universal
     - RxSwift
 
 EXTERNAL SOURCES:
@@ -25,8 +30,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider/ios"
 
 SPEC CHECKSUMS:
-  crypto_plugin: cd0081d902ef5e1c6a3cac4f7ec855fdde3ddd4d
+  crypto_plugin: 2b346951cbf22c63067b76cf22172357064e5ad5
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
   RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
 

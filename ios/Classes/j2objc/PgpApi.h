@@ -43,6 +43,8 @@
       withJavaIoInputStream:(JavaIoInputStream *)inputStream
      withJavaIoOutputStream:(JavaIoOutputStream *)outputStream;
 
+- (jboolean)getLastVerifyResult;
+
 - (NSString *)signWithNSString:(NSString *)text
                   withNSString:(NSString *)privateKey
                   withNSString:(NSString *)password;

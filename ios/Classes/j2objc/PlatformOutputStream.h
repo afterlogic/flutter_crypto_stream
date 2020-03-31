@@ -15,6 +15,7 @@
 #include "J2ObjC_header.h"
 #include "java/io/OutputStream.h"
 
+@class IOSByteArray;
 @class LibComAfterlogicPgpPlatform_streamStreamSink;
 
 @interface LibComAfterlogicPgpPlatform_streamPlatformOutputStream : JavaIoOutputStream
@@ -24,6 +25,10 @@
 - (instancetype __nonnull)initWithLibComAfterlogicPgpPlatform_streamStreamSink:(LibComAfterlogicPgpPlatform_streamStreamSink *)sink;
 
 - (void)close;
+
+- (void)writeWithByteArray:(IOSByteArray *)b
+                   withInt:(jint)off
+                   withInt:(jint)len;
 
 - (void)writeWithInt:(jint)b;
 

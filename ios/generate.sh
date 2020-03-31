@@ -14,3 +14,4 @@ rm -rf ${OUTPUT_DIR} && mkdir -p ${OUTPUT_DIR}
 --no-package-directories \
 -use-arc \
 $(find ${SOURCE_DIR} -name '*.java')
+

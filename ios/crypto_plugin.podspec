@@ -24,7 +24,8 @@ A new Flutter project.
 
   s.libraries = 'jre_emul', 'z', 'iconv'
 
-  s.static_framework = true
+  s.static_framework = true 
   s.dependency 'RxSwift', '~> 5'
+  s.dependency 'OpenSSL-Universal', '~> 1.0.2.17'
 end
 

@@ -37,6 +37,18 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
   return self;
 }
 
+- (void)writeWithByteArray:(IOSByteArray *)b
+                   withInt:(jint)off
+                   withInt:(jint)len {
+  LibComAfterlogicPgpPlatform_streamPlatformOutputStream_sendBuffer(self);
+  if (((IOSByteArray *) nil_chk(b))->size_ == len && off == 0) {
+    [((LibComAfterlogicPgpPlatform_streamStreamSink *) nil_chk(sink_)) addWithByteArray:b];
+  }
+  else {
+    [((LibComAfterlogicPgpPlatform_streamStreamSink *) nil_chk(sink_)) addWithByteArray:JavaUtilArrays_copyOfRangeWithByteArray_withInt_withInt_(b, off, len)];
+  }
+}
+
 - (void)writeWithInt:(jint)b {
   *IOSByteArray_GetRef(nil_chk(buffer_), position_) = (jbyte) b;
   position_++;
@@ -57,7 +69,8 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x1, -1, 0, -1, -1, -1, -1 },
-    { NULL, "V", 0x1, 1, 2, -1, -1, -1, -1 },
+    { NULL, "V", 0x1, 1, 2, 3, -1, -1, -1 },
+    { NULL, "V", 0x1, 1, 4, -1, -1, -1, -1 },
     { NULL, "V", 0x1, -1, -1, 3, -1, -1, -1 },
     { NULL, "V", 0x2, -1, -1, -1, -1, -1, -1 },
   };
@@ -65,9 +78,10 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
   #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
   #pragma clang diagnostic ignored "-Wundeclared-selector"
   methods[0].selector = @selector(initWithLibComAfterlogicPgpPlatform_streamStreamSink:);
-  methods[1].selector = @selector(writeWithInt:);
-  methods[2].selector = @selector(close);
-  methods[3].selector = @selector(sendBuffer);
+  methods[1].selector = @selector(writeWithByteArray:withInt:withInt:);
+  methods[2].selector = @selector(writeWithInt:);
+  methods[3].selector = @selector(close);
+  methods[4].selector = @selector(sendBuffer);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "sink_", "LLibComAfterlogicPgpPlatform_streamStreamSink;", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
@@ -75,8 +89,8 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
     { "buffer_", "[B", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
     { "position_", "I", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
   };
-  static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamSink;", "write", "I", "LJavaIoIOException;" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformOutputStream = { "PlatformOutputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 4, 4, -1, -1, -1, -1, -1 };
+  static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamSink;", "write", "[BII", "LJavaIoIOException;", "I" };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformOutputStream = { "PlatformOutputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 5, 4, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPlatform_streamPlatformOutputStream;
 }
 
@@ -100,9 +114,9 @@ LibComAfterlogicPgpPlatform_streamPlatformOutputStream *create_LibComAfterlogicP
 void LibComAfterlogicPgpPlatform_streamPlatformOutputStream_sendBuffer(LibComAfterlogicPgpPlatform_streamPlatformOutputStream *self) {
   if (self->position_ != 0) {
     [((LibComAfterlogicPgpPlatform_streamStreamSink *) nil_chk(self->sink_)) addWithByteArray:JavaUtilArrays_copyOfRangeWithByteArray_withInt_withInt_(self->buffer_, 0, self->position_)];
+    self->position_ = 0;
+    self->buffer_ = [IOSByteArray newArrayWithLength:LibComAfterlogicPgpPlatform_streamPlatformOutputStream_BUFFER_SIZE];
   }
-  self->position_ = 0;
-  self->buffer_ = [IOSByteArray newArrayWithLength:LibComAfterlogicPgpPlatform_streamPlatformOutputStream_BUFFER_SIZE];
 }
 
 J2OBJC_CLASS_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpPlatform_streamPlatformOutputStream)

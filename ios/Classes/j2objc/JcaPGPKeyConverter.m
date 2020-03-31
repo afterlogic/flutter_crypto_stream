@@ -327,6 +327,7 @@ J2OBJC_IGNORE_DESIGNATED_END
       case LibOrgBouncycastleBcpgPublicKeyAlgorithmTags_RSA_ENCRYPT:
       case LibOrgBouncycastleBcpgPublicKeyAlgorithmTags_RSA_SIGN:
       case LibOrgBouncycastleBcpgPublicKeyAlgorithmTags_RSA_GENERAL:
+            
       rsK = (id<JavaSecurityInterfacesRSAPrivateCrtKey>) cast_check(privKey, JavaSecurityInterfacesRSAPrivateCrtKey_class_());
       privPk = new_LibOrgBouncycastleBcpgRSASecretBCPGKey_initWithJavaMathBigInteger_withJavaMathBigInteger_withJavaMathBigInteger_([((id<JavaSecurityInterfacesRSAPrivateCrtKey>) nil_chk(rsK)) getPrivateExponent], [rsK getPrimeP], [rsK getPrimeQ]);
       break;

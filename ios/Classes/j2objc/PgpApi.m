@@ -155,6 +155,10 @@ J2OBJC_IGNORE_DESIGNATED_BEGIN
 }
 J2OBJC_IGNORE_DESIGNATED_END
 
+- (jboolean)getLastVerifyResult {
+  return lastVerifyResult_;
+}
+
 - (void)encryptWithNSString:(NSString *)privateKey
           withNSStringArray:(IOSObjectArray *)publicKeys
                withNSString:(NSString *)password
@@ -413,6 +417,7 @@ J2OBJC_IGNORE_DESIGNATED_END
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x1, -1, -1, -1, -1, -1, -1 },
+    { NULL, "Z", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x1, 0, 1, 2, -1, -1, -1 },
     { NULL, "V", 0x1, 3, 1, 2, -1, -1, -1 },
     { NULL, "LNSString;", 0x1, 4, 5, 6, -1, -1, -1 },
@@ -425,13 +430,14 @@ J2OBJC_IGNORE_DESIGNATED_END
   #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
   #pragma clang diagnostic ignored "-Wundeclared-selector"
   methods[0].selector = @selector(init);
-  methods[1].selector = @selector(encryptWithNSString:withNSStringArray:withNSString:withJavaIoInputStream:withJavaIoOutputStream:);
-  methods[2].selector = @selector(decryptWithNSString:withNSStringArray:withNSString:withJavaIoInputStream:withJavaIoOutputStream:);
-  methods[3].selector = @selector(signWithNSString:withNSString:withNSString:);
-  methods[4].selector = @selector(verifyWithNSString:withNSStringArray:);
-  methods[5].selector = @selector(symmetricallyEncryptWithJavaIoInputStream:withJavaIoOutputStream:withJavaIoFile:withJavaLangLong:withNSString:);
-  methods[6].selector = @selector(compressWithJavaIoInputStream:withJavaIoOutputStream:withInt:withLong:);
-  methods[7].selector = @selector(symmetricallyDecryptWithJavaIoInputStream:withJavaIoOutputStream:withNSString:);
+  methods[1].selector = @selector(getLastVerifyResult);
+  methods[2].selector = @selector(encryptWithNSString:withNSStringArray:withNSString:withJavaIoInputStream:withJavaIoOutputStream:);
+  methods[3].selector = @selector(decryptWithNSString:withNSStringArray:withNSString:withJavaIoInputStream:withJavaIoOutputStream:);
+  methods[4].selector = @selector(signWithNSString:withNSString:withNSString:);
+  methods[5].selector = @selector(verifyWithNSString:withNSStringArray:);
+  methods[6].selector = @selector(symmetricallyEncryptWithJavaIoInputStream:withJavaIoOutputStream:withJavaIoFile:withJavaLangLong:withNSString:);
+  methods[7].selector = @selector(compressWithJavaIoInputStream:withJavaIoOutputStream:withInt:withLong:);
+  methods[8].selector = @selector(symmetricallyDecryptWithJavaIoInputStream:withJavaIoOutputStream:withNSString:);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "lastVerifyResult_", "Z", .constantValue.asLong = 0, 0x1, -1, -1, -1, -1 },
@@ -441,7 +447,7 @@ J2OBJC_IGNORE_DESIGNATED_END
     { "END_SIGNATURE_", "LNSString;", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
   };
   static const void *ptrTable[] = { "encrypt", "LNSString;[LNSString;LNSString;LJavaIoInputStream;LJavaIoOutputStream;", "LJavaIoIOException;LLibOrgBouncycastleOpenpgpPGPException;LLibComAfterlogicPgpPgpError;", "decrypt", "sign", "LNSString;LNSString;LNSString;", "LLibComAfterlogicPgpPgpError;", "verify", "LNSString;[LNSString;", "symmetricallyEncrypt", "LJavaIoInputStream;LJavaIoOutputStream;LJavaIoFile;LJavaLangLong;LNSString;", "compress", "LJavaIoInputStream;LJavaIoOutputStream;IJ", "LJavaIoIOException;", "symmetricallyDecrypt", "LJavaIoInputStream;LJavaIoOutputStream;LNSString;" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPgpApi = { "PgpApi", "lib.com.afterlogic.pgp", ptrTable, methods, fields, 7, 0x1, 8, 5, -1, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPgpApi = { "PgpApi", "lib.com.afterlogic.pgp", ptrTable, methods, fields, 7, 0x1, 9, 5, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPgpApi;
 }
 

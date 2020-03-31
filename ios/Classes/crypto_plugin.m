@@ -1,4 +1,4 @@
-#import "CryptoPlugin.h"
+#import "crypto_plugin.h"
 #import <crypto_plugin/crypto_plugin-Swift.h>
 
 @implementation CryptoPlugin

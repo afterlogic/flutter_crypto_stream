@@ -9,18 +9,22 @@
 #include "StreamCallback.h"
 #include "java/io/InputStream.h"
 #include "java/lang/InterruptedException.h"
+#include "java/lang/Math.h"
+#include "java/lang/System.h"
 #include "java/lang/Throwable.h"
 #include "java/util/concurrent/CountDownLatch.h"
 
 @interface LibComAfterlogicPgpPlatform_streamPlatformInputStream () {
  @public
   jboolean isClosed_;
-  jint bufferSize_;
   IOSByteArray *buffer_;
   jint position_;
   LibComAfterlogicPgpPlatform_streamStreamCallback *endBufferCallback_;
   JavaUtilConcurrentCountDownLatch *countDownLatch_;
 }
+
+- (jint)readBufferWithByteArray:(IOSByteArray *)output
+                        withInt:(jint)size;
 
 - (void)pause;
 
@@ -29,6 +33,8 @@
 J2OBJC_FIELD_SETTER(LibComAfterlogicPgpPlatform_streamPlatformInputStream, buffer_, IOSByteArray *)
 J2OBJC_FIELD_SETTER(LibComAfterlogicPgpPlatform_streamPlatformInputStream, endBufferCallback_, LibComAfterlogicPgpPlatform_streamStreamCallback *)
 J2OBJC_FIELD_SETTER(LibComAfterlogicPgpPlatform_streamPlatformInputStream, countDownLatch_, JavaUtilConcurrentCountDownLatch *)
+
+__attribute__((unused)) static jint LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArray_withInt_(LibComAfterlogicPgpPlatform_streamPlatformInputStream *self, IOSByteArray *output, jint size);
 
 __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformInputStream_pause(LibComAfterlogicPgpPlatform_streamPlatformInputStream *self);
 
@@ -41,14 +47,27 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
 
 - (void)addBufferWithByteArray:(IOSByteArray *)buffer {
   self->buffer_ = buffer;
-  bufferSize_ = ((IOSByteArray *) nil_chk(buffer))->size_;
   position_ = 0;
-  if (buffer->size_ == 1 && IOSByteArray_Get(buffer, 0) == -1) {
+  if (((IOSByteArray *) nil_chk(buffer))->size_ == 1 && IOSByteArray_Get(buffer, 0) == -1) {
     [self close];
   }
   if (countDownLatch_ != nil) {
     [countDownLatch_ countDown];
   }
+}
+
+- (jint)readWithByteArray:(IOSByteArray *)b
+                  withInt:(jint)off
+                  withInt:(jint)len {
+  if (off > 0) {
+    LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArray_withInt_(self, nil, off);
+  }
+  return LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArray_withInt_(self, b, len);
+}
+
+- (jint)readBufferWithByteArray:(IOSByteArray *)output
+                        withInt:(jint)size {
+  return LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArray_withInt_(self, output, size);
 }
 
 - (jint)read {
@@ -81,6 +100,8 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x1, -1, 0, -1, -1, -1, -1 },
     { NULL, "V", 0x1, 1, 2, -1, -1, -1, -1 },
+    { NULL, "I", 0x1, 3, 4, 5, -1, -1, -1 },
+    { NULL, "I", 0x2, 6, 7, -1, -1, -1, -1 },
     { NULL, "I", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x2, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x1, -1, -1, -1, -1, -1, -1 },
@@ -90,20 +111,21 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   #pragma clang diagnostic ignored "-Wundeclared-selector"
   methods[0].selector = @selector(initWithLibComAfterlogicPgpPlatform_streamStreamCallback:);
   methods[1].selector = @selector(addBufferWithByteArray:);
-  methods[2].selector = @selector(read);
-  methods[3].selector = @selector(pause);
-  methods[4].selector = @selector(close);
+  methods[2].selector = @selector(readWithByteArray:withInt:withInt:);
+  methods[3].selector = @selector(readBufferWithByteArray:withInt:);
+  methods[4].selector = @selector(read);
+  methods[5].selector = @selector(pause);
+  methods[6].selector = @selector(close);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "isClosed_", "Z", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
-    { "bufferSize_", "I", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
     { "buffer_", "[B", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
     { "position_", "I", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
     { "endBufferCallback_", "LLibComAfterlogicPgpPlatform_streamStreamCallback;", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
     { "countDownLatch_", "LJavaUtilConcurrentCountDownLatch;", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
   };
-  static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamCallback;", "addBuffer", "[B" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformInputStream = { "PlatformInputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 5, 6, -1, -1, -1, -1, -1 };
+  static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamCallback;", "addBuffer", "[B", "read", "[BII", "LJavaIoIOException;", "readBuffer", "[BI" };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformInputStream = { "PlatformInputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 7, 5, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPlatform_streamPlatformInputStream;
 }
 
@@ -112,7 +134,6 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
 void LibComAfterlogicPgpPlatform_streamPlatformInputStream_initWithLibComAfterlogicPgpPlatform_streamStreamCallback_(LibComAfterlogicPgpPlatform_streamPlatformInputStream *self, LibComAfterlogicPgpPlatform_streamStreamCallback *endBufferCallback) {
   JavaIoInputStream_init(self);
   self->isClosed_ = false;
-  self->bufferSize_ = 0;
   self->buffer_ = [IOSByteArray newArrayWithLength:0];
   self->position_ = 0;
   self->endBufferCallback_ = endBufferCallback;
@@ -124,6 +145,28 @@ LibComAfterlogicPgpPlatform_streamPlatformInputStream *new_LibComAfterlogicPgpPl
 
 LibComAfterlogicPgpPlatform_streamPlatformInputStream *create_LibComAfterlogicPgpPlatform_streamPlatformInputStream_initWithLibComAfterlogicPgpPlatform_streamStreamCallback_(LibComAfterlogicPgpPlatform_streamStreamCallback *endBufferCallback) {
   J2OBJC_CREATE_IMPL(LibComAfterlogicPgpPlatform_streamPlatformInputStream, initWithLibComAfterlogicPgpPlatform_streamStreamCallback_, endBufferCallback)
+}
+
+jint LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArray_withInt_(LibComAfterlogicPgpPlatform_streamPlatformInputStream *self, IOSByteArray *output, jint size) {
+  jint outPos = 0;
+  while (outPos < size) {
+    if (self->isClosed_) {
+      if (outPos == 0) {
+        return -1;
+      }
+      return outPos;
+    }
+    jint len = JavaLangMath_minWithInt_withInt_(size - outPos, ((IOSByteArray *) nil_chk(self->buffer_))->size_ - self->position_);
+    if (output != nil) {
+      JavaLangSystem_arraycopyWithId_withInt_withId_withInt_withInt_(self->buffer_, self->position_, output, outPos, len);
+    }
+    outPos += len;
+    self->position_ += len;
+    if (self->position_ >= ((IOSByteArray *) nil_chk(self->buffer_))->size_) {
+      LibComAfterlogicPgpPlatform_streamPlatformInputStream_pause(self);
+    }
+  }
+  return outPos;
 }
 
 void LibComAfterlogicPgpPlatform_streamPlatformInputStream_pause(LibComAfterlogicPgpPlatform_streamPlatformInputStream *self) {

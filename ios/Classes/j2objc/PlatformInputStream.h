@@ -30,6 +30,10 @@
 
 - (jint)read;
 
+- (jint)readWithByteArray:(IOSByteArray *)b
+                  withInt:(jint)off
+                  withInt:(jint)len;
+
 // Disallowed inherited constructors, do not use.
 
 - (instancetype __nonnull)init NS_UNAVAILABLE;
