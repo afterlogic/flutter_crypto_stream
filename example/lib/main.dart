@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -40,7 +41,6 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
 
   final textCtrl = TextEditingController();
   var outText = "";
-  List<int> outByte = [];
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +56,19 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text("bufferEncrypt"),
+                        onPressed: bufferEncrypt,
+                      ),
+                      FlatButton(
+                        child: Text("bufferDecrypt"),
+                        onPressed: bufferDecrypt,
+                      ),
+                    ],
+                  ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
@@ -111,16 +124,32 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     );
   }
 
+  bufferEncrypt() async {
+    outText = await pgp.bufferPlatformSink(
+      textCtrl.text,
+      pgp.encrypt(null, [publicKey], password),
+    );
+    setState(() {});
+  }
+
+  bufferDecrypt() async {
+    outText = await pgp.bufferPlatformSink(
+      outText,
+      pgp.decrypt(privateKey, null, password),
+    );
+    setState(() {});
+  }
+
   encrypt() async {
-    var currentBytes = textCtrl.text.codeUnits;
-    outByte = List<int>();
+    var currentBytes = utf8.encode(textCtrl.text);
+    var outByte = List<int>();
     pgp.encrypt(null, [publicKey], password).listen((data) {
       outByte.addAll(data);
     }, onError: (e, s) {
       print(s);
       outText = "$e\n\n\n$s";
     }).onDone(() {
-      outText = String.fromCharCodes(outByte);
+      outText = utf8.decode(outByte);
       setState(() {});
     });
 
@@ -129,8 +158,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -139,15 +169,15 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   }
 
   decrypt() async {
-    var currentBytes = outByte;
-    outByte = List<int>();
+    var currentBytes = utf8.encode(outText);
+    var outByte = List<int>();
     pgp.decrypt(privateKey, null, password).listen((data) {
       outByte.addAll(data);
     }, onError: (e, s) {
       print(s);
       outText = "$e\n\n\n$s";
     }).onDone(() {
-      outText = String.fromCharCodes(outByte);
+      outText = utf8.decode(outByte);
       setState(() {});
     });
 
@@ -156,8 +186,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -172,18 +203,17 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
       await tempFile.delete();
     }
 
-    var currentBytes = textCtrl.text.codeUnits;
-    outByte = List<int>();
+    var currentBytes = utf8.encode(textCtrl.text);
+    var outByte = List<int>();
     pgp.symmetricallyEncrypt(tempFile, password, currentBytes.length).listen(
-      (data) {
-        outByte.addAll(data);
-      }, onError: (e, s) {
+        (data) {
+      outByte.addAll(data);
+    }, onError: (e, s) {
       print(s);
       outText = "$e\n\n\n$s";
-    }
-    ).onDone(
+    }).onDone(
       () {
-        outText = String.fromCharCodes(outByte);
+        outText = utf8.decode(outByte);
         setState(() {});
       },
     );
@@ -193,8 +223,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -203,18 +234,16 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   }
 
   symmetricallyDecrypt() async {
-    var currentBytes = outByte;
-    outByte = List<int>();
-    pgp.symmetricallyDecrypt(password).listen(
-      (data) {
-        outByte.addAll(data);
-      }, onError: (e, s) {
+    var currentBytes = utf8.encode(outText);
+    var outByte = List<int>();
+    pgp.symmetricallyDecrypt(password).listen((data) {
+      outByte.addAll(data);
+    }, onError: (e, s) {
       print(s);
       outText = "$e\n\n\n$s";
-    }
-    ).onDone(
+    }).onDone(
       () {
-        outText = String.fromCharCodes(outByte);
+        outText = utf8.decode(outByte);
         setState(() {});
       },
     );
@@ -224,8 +253,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);

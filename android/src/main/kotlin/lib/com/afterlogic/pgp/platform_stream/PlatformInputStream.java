@@ -88,6 +88,7 @@ public class PlatformInputStream extends InputStream {
         if (countDownLatch != null) {
             countDownLatch.countDown();
         }
+        endBufferCallback.invoke();
         isClosed = true;
     }
 }

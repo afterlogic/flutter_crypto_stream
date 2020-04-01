@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -7,17 +8,34 @@ import 'crypt.dart';
 class Pgp extends Crypt {
   @override
   final algorithm = "pgp";
+  final Utf8Codec utf8 = Utf8Codec(allowMalformed: true);
 
   Future _sendData(List<int> data) {
     return method("sendData", [Uint8List.fromList(data)]);
   }
 
-  PlatformSink platformSink() {
-    return PlatformSink((data) {
+  _PlatformSink platformSink() {
+    return _PlatformSink((data) {
       return _sendData(data);
     }, () {
       return _sendData([-1]);
     });
+  }
+
+  Future<String> bufferPlatformSink(
+    String text,
+    Stream<List<int>> stream,
+  ) async {
+    final sink = platformSink();
+    final future = utf8.decodeStream(stream);
+    try {
+      await sink.add(utf8.encode(text));
+      await sink.close();
+      return await future;
+    } catch (_) {
+      sink.close();
+      rethrow;
+    }
   }
 
   Stream<List<int>> encrypt(
@@ -155,11 +173,11 @@ class Pgp extends Crypt {
   }
 }
 
-class PlatformSink extends Sink<List<int>> {
+class _PlatformSink extends Sink<List<int>> {
   final Future Function(List<int>) _onAdd;
   final Future Function() _onClose;
 
-  PlatformSink(this._onAdd, this._onClose);
+  _PlatformSink(this._onAdd, this._onClose);
 
   Future add(List<int> data) {
     return _onAdd(data);
