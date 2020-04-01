@@ -1,5 +1,17 @@
 package lib.com.afterlogic.pgp;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Iterator;
+
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
@@ -14,7 +26,6 @@ import lib.com.afterlogic.pgp.key.protection.PasswordBasedSecretKeyRingProtector
 import lib.com.afterlogic.pgp.key.protection.SecretKeyPassphraseProvider;
 import lib.com.afterlogic.pgp.util.NewPGPUtil;
 import lib.com.afterlogic.pgp.util.Passphrase;
-
 import lib.org.bouncycastle.bcpg.ArmoredOutputStream;
 import lib.org.bouncycastle.bcpg.BCPGOutputStream;
 import lib.org.bouncycastle.bcpg.HashAlgorithmTags;
@@ -29,6 +40,7 @@ import lib.org.bouncycastle.openpgp.PGPPBEEncryptedData;
 import lib.org.bouncycastle.openpgp.PGPPrivateKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKey;
 import lib.org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import lib.org.bouncycastle.openpgp.PGPSecretKey;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSignature;
@@ -43,17 +55,6 @@ import lib.org.bouncycastle.openpgp.operator.bc.BcPGPContentVerifierBuilderProvi
 import lib.org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import lib.org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import lib.org.bouncycastle.util.io.Streams;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.SecureRandom;
-import java.util.Date;
 
 public class PgpApi {
     public boolean lastVerifyResult = true;
@@ -83,7 +84,13 @@ public class PgpApi {
             EncryptionBuilderInterface.Armor armor;
             if (privateKey != null && password != null) {
                 KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithmUtil.MD5, 0);
-                PGPSecretKeyRing secretKeys = new KeyRingReader().secretKeyRing(privateKey);
+                PGPSecretKeyRing secretKeysRing = new KeyRingReader().secretKeyRing(privateKey);
+                PGPSecretKey secretKey = null;
+                for (PGPSecretKey key : secretKeysRing) {
+                    if (secretKey == null || key.isMasterKey()) {
+                        secretKey = key;
+                    }
+                }
                 PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
                     @Override
                     public Passphrase getPassphraseFor(Long keyId) {
@@ -91,7 +98,7 @@ public class PgpApi {
                     }
                 });
 
-                armor = signWith.signWith(secretKeyRingProtector, secretKeys);
+                armor = signWith.signWith(secretKeyRingProtector, secretKey);
             } else {
                 armor = signWith.doNotSign();
             }
@@ -174,8 +181,22 @@ public class PgpApi {
 
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             InputStream input = new ByteArrayInputStream(text.getBytes());
+            KeyRingProtectionSettings setting = new KeyRingProtectionSettings(SymmetricKeyAlgorithm.AES_256, HashAlgorithmUtil.MD5, 0);
+            PGPSecretKeyRing secretKeysRing = new KeyRingReader().secretKeyRing(privateKey);
+            PasswordBasedSecretKeyRingProtector secretKeyRingProtector = new PasswordBasedSecretKeyRingProtector(setting, new SecretKeyPassphraseProvider() {
+                @Override
+                public Passphrase getPassphraseFor(Long keyId) {
+                    return new Passphrase(password.toCharArray());
+                }
+            });
+            PGPSecretKey secretKey = null;
+            for (PGPSecretKey key : secretKeysRing) {
+                if (secretKey == null || key.isMasterKey()) {
+                    secretKey = key;
+                }
+            }
 
-            PGPPrivateKey pgpPrivateKey = PgpUtilApi.getPrivateKey(privateKey, password);
+            PGPPrivateKey pgpPrivateKey =secretKey.extractPrivateKey(secretKeyRingProtector.getDecryptor(secretKey.getKeyID()));
 
             PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
                     new BcPGPContentSignerBuilder(
