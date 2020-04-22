@@ -31,6 +31,7 @@
 #include "MissingPublicKeyCallback.h"
 #include "NewPGPUtil.h"
 #include "PBEKeyEncryptionMethodGenerator.h"
+#include "PBESecretKeyDecryptor.h"
 #include "PGPCompressedData.h"
 #include "PGPCompressedDataGenerator.h"
 #include "PGPEncryptedDataGenerator.h"
@@ -41,6 +42,7 @@
 #include "PGPPrivateKey.h"
 #include "PGPPublicKey.h"
 #include "PGPPublicKeyRingCollection.h"
+#include "PGPSecretKey.h"
 #include "PGPSecretKeyRing.h"
 #include "PGPSecretKeyRingCollection.h"
 #include "PGPSignature.h"
@@ -146,6 +148,25 @@ __attribute__((unused)) static LibComAfterlogicPgpPgpApi_3 *new_LibComAfterlogic
 
 __attribute__((unused)) static LibComAfterlogicPgpPgpApi_3 *create_LibComAfterlogicPgpPgpApi_3_initWithLibComAfterlogicPgpPgpApi_(LibComAfterlogicPgpPgpApi *outer$);
 
+@interface LibComAfterlogicPgpPgpApi_4 : NSObject < LibComAfterlogicPgpKeyProtectionSecretKeyPassphraseProvider > {
+ @public
+  NSString *val$password_;
+}
+
+- (instancetype)initWithNSString:(NSString *)capture$0;
+
+- (LibComAfterlogicPgpUtilPassphrase *)getPassphraseForWithJavaLangLong:(JavaLangLong *)keyId;
+
+@end
+
+J2OBJC_EMPTY_STATIC_INIT(LibComAfterlogicPgpPgpApi_4)
+
+__attribute__((unused)) static void LibComAfterlogicPgpPgpApi_4_initWithNSString_(LibComAfterlogicPgpPgpApi_4 *self, NSString *capture$0);
+
+__attribute__((unused)) static LibComAfterlogicPgpPgpApi_4 *new_LibComAfterlogicPgpPgpApi_4_initWithNSString_(NSString *capture$0) NS_RETURNS_RETAINED;
+
+__attribute__((unused)) static LibComAfterlogicPgpPgpApi_4 *create_LibComAfterlogicPgpPgpApi_4_initWithNSString_(NSString *capture$0);
+
 @implementation LibComAfterlogicPgpPgpApi
 
 J2OBJC_IGNORE_DESIGNATED_BEGIN
@@ -170,9 +191,15 @@ J2OBJC_IGNORE_DESIGNATED_END
     id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_Armor> armor;
     if (privateKey != nil && password != nil) {
       LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings *setting = new_LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings_initWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm_withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil_withInt_(JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256), JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, MD5), 0);
-      LibOrgBouncycastleOpenpgpPGPSecretKeyRing *secretKeys = [new_LibComAfterlogicPgpKeyParsingKeyRingReader_init() secretKeyRingWithNSString:privateKey];
+      LibOrgBouncycastleOpenpgpPGPSecretKeyRing *secretKeysRing = [new_LibComAfterlogicPgpKeyParsingKeyRingReader_init() secretKeyRingWithNSString:privateKey];
+      LibOrgBouncycastleOpenpgpPGPSecretKey *secretKey = nil;
+      for (LibOrgBouncycastleOpenpgpPGPSecretKey * __strong key in nil_chk(secretKeysRing)) {
+        if (secretKey == nil || [((LibOrgBouncycastleOpenpgpPGPSecretKey *) nil_chk(key)) isMasterKey]) {
+          secretKey = key;
+        }
+      }
       LibComAfterlogicPgpKeyProtectionPasswordBasedSecretKeyRingProtector *secretKeyRingProtector = new_LibComAfterlogicPgpKeyProtectionPasswordBasedSecretKeyRingProtector_initWithLibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings_withLibComAfterlogicPgpKeyProtectionSecretKeyPassphraseProvider_(setting, new_LibComAfterlogicPgpPgpApi_1_initWithNSString_(password));
-      armor = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_SignWith>) nil_chk(signWith)) signWithWithLibComAfterlogicPgpKeyProtectionSecretKeyRingProtector:secretKeyRingProtector withLibOrgBouncycastleOpenpgpPGPSecretKeyRingArray:[IOSObjectArray newArrayWithObjects:(id[]){ secretKeys } count:1 type:LibOrgBouncycastleOpenpgpPGPSecretKeyRing_class_()]];
+      armor = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_SignWith>) nil_chk(signWith)) signWithWithLibComAfterlogicPgpKeyProtectionSecretKeyRingProtector:secretKeyRingProtector withLibOrgBouncycastleOpenpgpPGPSecretKeyArray:[IOSObjectArray newArrayWithObjects:(id[]){ secretKey } count:1 type:LibOrgBouncycastleOpenpgpPGPSecretKey_class_()]];
     }
     else {
       armor = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_SignWith>) nil_chk(signWith)) doNotSign];
@@ -234,7 +261,16 @@ J2OBJC_IGNORE_DESIGNATED_END
   @try {
     JavaIoByteArrayOutputStream *output = new_JavaIoByteArrayOutputStream_init();
     JavaIoInputStream *input = new_JavaIoByteArrayInputStream_initWithByteArray_([((NSString *) nil_chk(text)) java_getBytes]);
-    LibOrgBouncycastleOpenpgpPGPPrivateKey *pgpPrivateKey = LibComAfterlogicPgpPgpUtilApi_getPrivateKeyWithNSString_withNSString_(privateKey, password);
+    LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings *setting = new_LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings_initWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm_withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil_withInt_(JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256), JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, MD5), 0);
+    LibOrgBouncycastleOpenpgpPGPSecretKeyRing *secretKeysRing = [new_LibComAfterlogicPgpKeyParsingKeyRingReader_init() secretKeyRingWithNSString:privateKey];
+    LibComAfterlogicPgpKeyProtectionPasswordBasedSecretKeyRingProtector *secretKeyRingProtector = new_LibComAfterlogicPgpKeyProtectionPasswordBasedSecretKeyRingProtector_initWithLibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings_withLibComAfterlogicPgpKeyProtectionSecretKeyPassphraseProvider_(setting, new_LibComAfterlogicPgpPgpApi_4_initWithNSString_(password));
+    LibOrgBouncycastleOpenpgpPGPSecretKey *secretKey = nil;
+    for (LibOrgBouncycastleOpenpgpPGPSecretKey * __strong key in nil_chk(secretKeysRing)) {
+      if (secretKey == nil || [((LibOrgBouncycastleOpenpgpPGPSecretKey *) nil_chk(key)) isMasterKey]) {
+        secretKey = key;
+      }
+    }
+    LibOrgBouncycastleOpenpgpPGPPrivateKey *pgpPrivateKey = [((LibOrgBouncycastleOpenpgpPGPSecretKey *) nil_chk(secretKey)) extractPrivateKeyWithLibOrgBouncycastleOpenpgpOperatorPBESecretKeyDecryptor:[secretKeyRingProtector getDecryptorWithJavaLangLong:JavaLangLong_valueOfWithLong_([secretKey getKeyID])]];
     LibOrgBouncycastleOpenpgpPGPSignatureGenerator *signatureGenerator = new_LibOrgBouncycastleOpenpgpPGPSignatureGenerator_initWithLibOrgBouncycastleOpenpgpOperatorPGPContentSignerBuilder_(new_LibOrgBouncycastleOpenpgpOperatorBcBcPGPContentSignerBuilder_initWithInt_withInt_([((LibOrgBouncycastleBcpgPublicKeyPacket *) nil_chk([((LibOrgBouncycastleOpenpgpPGPPrivateKey *) nil_chk(pgpPrivateKey)) getPublicKeyPacket])) getAlgorithm], LibOrgBouncycastleBcpgHashAlgorithmTags_SHA512));
     [signatureGenerator init__WithInt:LibOrgBouncycastleOpenpgpPGPSignature_CANONICAL_TEXT_DOCUMENT withLibOrgBouncycastleOpenpgpPGPPrivateKey:pgpPrivateKey];
     JavaIoOutputStream *armor = new_LibOrgBouncycastleBcpgArmoredOutputStream_initWithJavaIoOutputStream_(output);
@@ -616,4 +652,49 @@ LibComAfterlogicPgpPgpApi_3 *new_LibComAfterlogicPgpPgpApi_3_initWithLibComAfter
 
 LibComAfterlogicPgpPgpApi_3 *create_LibComAfterlogicPgpPgpApi_3_initWithLibComAfterlogicPgpPgpApi_(LibComAfterlogicPgpPgpApi *outer$) {
   J2OBJC_CREATE_IMPL(LibComAfterlogicPgpPgpApi_3, initWithLibComAfterlogicPgpPgpApi_, outer$)
+}
+
+@implementation LibComAfterlogicPgpPgpApi_4
+
+- (instancetype)initWithNSString:(NSString *)capture$0 {
+  LibComAfterlogicPgpPgpApi_4_initWithNSString_(self, capture$0);
+  return self;
+}
+
+- (LibComAfterlogicPgpUtilPassphrase *)getPassphraseForWithJavaLangLong:(JavaLangLong *)keyId {
+  return new_LibComAfterlogicPgpUtilPassphrase_initWithCharArray_([((NSString *) nil_chk(val$password_)) java_toCharArray]);
+}
+
++ (const J2ObjcClassInfo *)__metadata {
+  static J2ObjcMethodInfo methods[] = {
+    { NULL, NULL, 0x0, -1, -1, -1, -1, -1, -1 },
+    { NULL, "LLibComAfterlogicPgpUtilPassphrase;", 0x1, 0, 1, -1, -1, -1, -1 },
+  };
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
+  #pragma clang diagnostic ignored "-Wundeclared-selector"
+  methods[0].selector = @selector(initWithNSString:);
+  methods[1].selector = @selector(getPassphraseForWithJavaLangLong:);
+  #pragma clang diagnostic pop
+  static const J2ObjcFieldInfo fields[] = {
+    { "val$password_", "LNSString;", .constantValue.asLong = 0, 0x1012, -1, -1, -1, -1 },
+  };
+  static const void *ptrTable[] = { "getPassphraseFor", "LJavaLangLong;", "LLibComAfterlogicPgpPgpApi;", "signWithNSString:withNSString:withNSString:" };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPgpApi_4 = { "", "lib.com.afterlogic.pgp", ptrTable, methods, fields, 7, 0x8010, 2, 1, 2, -1, 3, -1, -1 };
+  return &_LibComAfterlogicPgpPgpApi_4;
+}
+
+@end
+
+void LibComAfterlogicPgpPgpApi_4_initWithNSString_(LibComAfterlogicPgpPgpApi_4 *self, NSString *capture$0) {
+  self->val$password_ = capture$0;
+  NSObject_init(self);
+}
+
+LibComAfterlogicPgpPgpApi_4 *new_LibComAfterlogicPgpPgpApi_4_initWithNSString_(NSString *capture$0) {
+  J2OBJC_NEW_IMPL(LibComAfterlogicPgpPgpApi_4, initWithNSString_, capture$0)
+}
+
+LibComAfterlogicPgpPgpApi_4 *create_LibComAfterlogicPgpPgpApi_4_initWithNSString_(NSString *capture$0) {
+  J2OBJC_CREATE_IMPL(LibComAfterlogicPgpPgpApi_4, initWithNSString_, capture$0)
 }

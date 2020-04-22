@@ -93,6 +93,7 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   if (countDownLatch_ != nil) {
     [countDownLatch_ countDown];
   }
+  [((LibComAfterlogicPgpPlatform_streamStreamCallback *) nil_chk(endBufferCallback_)) invoke];
   isClosed_ = true;
 }
 
