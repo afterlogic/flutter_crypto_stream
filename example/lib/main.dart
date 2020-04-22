@@ -9,7 +9,9 @@ import 'package:path_provider/path_provider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+  final Utf8Codec utf8 = Utf8Codec(allowMalformed: true);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.Iterator;
 
 import lib.com.afterlogic.pgp.algorithm.CompressionAlgorithm;
 import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
@@ -196,7 +195,7 @@ public class PgpApi {
                 }
             }
 
-            PGPPrivateKey pgpPrivateKey =secretKey.extractPrivateKey(secretKeyRingProtector.getDecryptor(secretKey.getKeyID()));
+            PGPPrivateKey pgpPrivateKey = secretKey.extractPrivateKey(secretKeyRingProtector.getDecryptor(secretKey.getKeyID()));
 
             PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
                     new BcPGPContentSignerBuilder(
@@ -214,7 +213,9 @@ public class PgpApi {
             while ((read = input.read(buff)) != -1) {
                 signatureGenerator.update(buff, 0, read);
             }
-            signatureGenerator.generate().encode(stream);
+
+            PGPSignature pgpSignature = signatureGenerator.generate();
+            pgpSignature.encode(stream);
 
             armor.close();
             stream.close();
@@ -223,7 +224,7 @@ public class PgpApi {
 
             String signature = new String(output.toByteArray());
             return PGP_SIGN_TITLE + "\r\n" +
-                    "Hash: SHA256\r\n\r\n" +
+                    "Hash: SHA512\r\n\r\n" +
                     text + "\r\n" +
                     signature;
         } catch (Throwable e) {
