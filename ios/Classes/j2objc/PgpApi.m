@@ -280,13 +280,14 @@ J2OBJC_IGNORE_DESIGNATED_END
     while ((read = [input readWithByteArray:buff]) != -1) {
       [signatureGenerator updateWithByteArray:buff withInt:0 withInt:read];
     }
-    [((LibOrgBouncycastleOpenpgpPGPSignature *) nil_chk([signatureGenerator generate])) encodeWithJavaIoOutputStream:stream];
+    LibOrgBouncycastleOpenpgpPGPSignature *pgpSignature = [signatureGenerator generate];
+    [((LibOrgBouncycastleOpenpgpPGPSignature *) nil_chk(pgpSignature)) encodeWithJavaIoOutputStream:stream];
     [armor close];
     [stream close];
     [output close];
     [input close];
     NSString *signature = [NSString java_stringWithBytes:[output toByteArray]];
-    return JreStrcat("$$$$$", PGP_SIGN_TITLE_, @"\x0d\nHash: SHA256\x0d\n\x0d\n", text, @"\x0d\n", signature);
+    return JreStrcat("$$$$$", PGP_SIGN_TITLE_, @"\x0d\nHash: SHA512\x0d\n\x0d\n", text, @"\x0d\n", signature);
   }
   @catch (JavaLangThrowable *e) {
     if ([e isKindOfClass:[LibComAfterlogicPgpPgpError class]]) {
