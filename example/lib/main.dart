@@ -9,7 +9,6 @@ import 'package:path_provider/path_provider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-
   final Utf8Codec utf8 = Utf8Codec(allowMalformed: true);
 
   @override
@@ -129,7 +128,7 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   bufferEncrypt() async {
     outText = await pgp.bufferPlatformSink(
       textCtrl.text,
-      pgp.encrypt(null, [publicKey], password),
+      pgp.encrypt(null, [publicKey], null),
     );
     setState(() {});
   }

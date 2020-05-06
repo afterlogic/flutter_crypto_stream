@@ -63,6 +63,7 @@ class PgpApiTest {
 
         val keys = pgpUtilApi.createKeys(length, email, password)
         var description = pgpUtilApi.getKeyDescription(keys[0])
+        assert(pgpUtilApi.checkKeyPassword(keys[1],password))
         assert(!description.isPrivate && description.emails[0] == email && description.length - length < 100)
         description = pgpUtilApi.getKeyDescription(keys[1])
         assert(description.isPrivate && description.emails[0] == email && description.length - length < 100)

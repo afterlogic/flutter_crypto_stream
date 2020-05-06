@@ -1,13 +1,6 @@
 package com.afterlogic.crypto_stream
 
 import com.afterlogic.crypto_stream.aes.Aes
-import lib.com.afterlogic.pgp.PgpApi
-import lib.com.afterlogic.pgp.PgpError
-import lib.com.afterlogic.pgp.PgpUtilApi
-import lib.com.afterlogic.pgp.platform_stream.PlatformInputStream
-import lib.com.afterlogic.pgp.platform_stream.PlatformOutputStream
-import lib.com.afterlogic.pgp.platform_stream.StreamCallback
-import lib.com.afterlogic.pgp.platform_stream.StreamSink
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -21,6 +14,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.schedulers.SingleScheduler
 import io.reactivex.subjects.BehaviorSubject
+import lib.com.afterlogic.pgp.PgpApi
+import lib.com.afterlogic.pgp.PgpError
+import lib.com.afterlogic.pgp.PgpUtilApi
+import lib.com.afterlogic.pgp.platform_stream.PlatformInputStream
+import lib.com.afterlogic.pgp.platform_stream.PlatformOutputStream
+import lib.com.afterlogic.pgp.platform_stream.StreamCallback
+import lib.com.afterlogic.pgp.platform_stream.StreamSink
+import lib.org.bouncycastle.util.io.Streams
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
@@ -105,13 +108,21 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
     private fun streamExecutor(events: EventChannel.EventSink, create: () -> Unit) {
         Completable.create {
-            create()
-            it.onComplete()
+            try {
+                create()
+                it.onComplete()
+            } catch (e: Throwable) {
+                it.onError(e)
+            }
+            subject.onNext {
+                stop()
+            }
         }
                 .subscribeOn(executionScheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    events.endOfStream()
+                    subject.onNext { events.endOfStream() }
+
                 }, {
                     it.printStackTrace()
                     when (it) {
@@ -119,7 +130,8 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                         else -> events.error(it.javaClass.toString(), it.message, "")
                     }
 
-                    events.endOfStream()
+                    subject.onNext { events.endOfStream() }
+
                 })
                 .let {
                     disposable.add(it)
@@ -127,10 +139,16 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
     }
 
     override fun onCancel(arguments: Any?) {
-        output?.close()
-        input?.close()
+
     }
 
+    private fun stop() {
+        output?.close()
+        input?.close()
+        output = null
+        input = null
+        flutterCallback = FlutterCallback()
+    }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
 

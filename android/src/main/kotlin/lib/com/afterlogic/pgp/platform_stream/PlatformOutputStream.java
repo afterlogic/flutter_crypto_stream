@@ -1,7 +1,6 @@
 package lib.com.afterlogic.pgp.platform_stream;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -10,7 +9,7 @@ public class PlatformOutputStream extends OutputStream {
     private final StreamSink sink;
     private static final int BUFFER_SIZE = 16 << 8;
     private byte[] buffer = new byte[BUFFER_SIZE];
-
+    private boolean isClosed = false;
     private int position = 0;
 
     public PlatformOutputStream(StreamSink sink) {
@@ -38,10 +37,14 @@ public class PlatformOutputStream extends OutputStream {
         }
     }
 
+
     @Override
     public void close() throws IOException {
-        sendBuffer();
-        super.close();
+        if(!isClosed) {
+            isClosed = true;
+            sendBuffer();
+            super.close();
+        }
     }
 
     private void sendBuffer() {

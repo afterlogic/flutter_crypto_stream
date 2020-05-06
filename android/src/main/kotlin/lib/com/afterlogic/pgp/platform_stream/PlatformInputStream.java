@@ -1,9 +1,9 @@
 package lib.com.afterlogic.pgp.platform_stream;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class PlatformInputStream extends InputStream {
     private boolean isClosed = false;
@@ -76,7 +76,7 @@ public class PlatformInputStream extends InputStream {
         countDownLatch = new CountDownLatch(1);
         endBufferCallback.invoke();
         try {
-            countDownLatch.await();
+            countDownLatch.await(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -88,8 +88,10 @@ public class PlatformInputStream extends InputStream {
         if (countDownLatch != null) {
             countDownLatch.countDown();
         }
-        endBufferCallback.invoke();
-        isClosed = true;
+        if (!isClosed) {
+            endBufferCallback.invoke();
+            isClosed = true;
+        }
     }
 }
 

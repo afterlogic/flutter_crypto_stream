@@ -1,5 +1,15 @@
 package lib.com.afterlogic.pgp;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
 import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
 import lib.com.afterlogic.pgp.key.collection.PGPKeyRingUtil;
@@ -12,7 +22,6 @@ import lib.com.afterlogic.pgp.key.protection.KeyRingProtectionSettings;
 import lib.com.afterlogic.pgp.key.protection.PasswordBasedSecretKeyRingProtector;
 import lib.com.afterlogic.pgp.key.protection.SecretKeyPassphraseProvider;
 import lib.com.afterlogic.pgp.util.Passphrase;
-
 import lib.org.bouncycastle.bcpg.ArmoredOutputStream;
 import lib.org.bouncycastle.openpgp.PGPException;
 import lib.org.bouncycastle.openpgp.PGPPrivateKey;
@@ -22,16 +31,6 @@ import lib.org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import lib.org.bouncycastle.openpgp.PGPSecretKey;
 import lib.org.bouncycastle.openpgp.PGPSecretKeyRing;
 import lib.org.bouncycastle.openpgp.PGPUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class PgpUtilApi {
 
@@ -127,7 +126,7 @@ public class PgpUtilApi {
                 }
             }
         } catch (Throwable e) {
-
+            e.printStackTrace();
         }
         throw new PgpError(PgpErrorCase.InvalidPassword);
     }
