@@ -171,7 +171,7 @@ class Pgp extends Crypt {
     );
     final list = result as List;
 
-    return KeyDescription(list[0], List.from(list[1]), list[2]);
+    return KeyDescription(list[0], List.from(list[1]), list[2], list[3]);
   }
 }
 
@@ -194,8 +194,9 @@ class KeyDescription {
   final int length;
   final List<String> emails;
   final bool isPrivate;
+  final String armoredKey;
 
-  KeyDescription(this.length, this.emails, this.isPrivate);
+  KeyDescription(this.length, this.emails, this.isPrivate, this.armoredKey);
 }
 
 class KeyPair {

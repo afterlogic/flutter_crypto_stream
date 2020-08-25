@@ -6,6 +6,7 @@ public class KeyDescription {
     private final boolean isPrivate;
     private final ArrayList<String> emails;
     private final int length;
+    private final String armoredKey;
 
     public int getLength() {
         return length;
@@ -19,9 +20,14 @@ public class KeyDescription {
         return isPrivate;
     }
 
-    public KeyDescription(boolean isPrivate, ArrayList<String> emails, int length) {
+    public KeyDescription(boolean isPrivate, ArrayList<String> emails, int length, String armoredKey) {
         this.isPrivate = isPrivate;
         this.emails = emails;
         this.length = length;
+        this.armoredKey = armoredKey;
+    }
+
+    public String getArmoredKey() {
+        return armoredKey;
     }
 }

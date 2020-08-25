@@ -63,10 +63,12 @@ class PgpApiTest {
 
         val keys = pgpUtilApi.createKeys(length, email, password)
         var description = pgpUtilApi.getKeyDescription(keys[0])
-        assert(pgpUtilApi.checkKeyPassword(keys[1],password))
+        assert(pgpUtilApi.checkKeyPassword(keys[1], password))
         assert(!description.isPrivate && description.emails[0] == email && description.length - length < 100)
         description = pgpUtilApi.getKeyDescription(keys[1])
         assert(description.isPrivate && description.emails[0] == email && description.length - length < 100)
+        description = pgpUtilApi.getKeyDescription(vasilPublicKey)
+        print(description);
     }
 
     @Test
@@ -82,7 +84,58 @@ class PgpApiTest {
     @Test
     fun test() {
         val pgp = PgpApi()
-        val decrypted = pgp.verify(invalidSignature, arrayOf(vasilPublicKey))
+        var input = "-----BEGIN PGP MESSAGE-----\n" +
+                "Version: BCPG v1.61\n" +
+                "\n" +
+                "hQEMAxNtCSOy0UAlAQgAi5fWUBvgM9a+U43aNkYQyzLbbMQXQJ6VuE9TtMuOnFBs\n" +
+                "1yBqFY1NrwwS0F3OrpSFvX9F4wdtqYKyBvpk/rzW7Sg0RebGbIcK/Fg5HhcmRHzv\n" +
+                "1SIpD235mKrKmmF3eecKBe51Xo6RUnxh4kyq8+eFdeLIF9Llj5Jy2tCdf4K3TRF7\n" +
+                "Z1pRXvEmYXEBEATshMzQE3jGGzvJ22Xvaoyb0IoXdW2iNLWS+eG1+zIBSOaB2iBm\n" +
+                "RMKrjFblZt+lzDancFi59jJapv+zLPWNANrw80YvO7mTgHrY1UZXRvVAnzqu9C31\n" +
+                "Pyc06hR0K8LfnU6ig2FhrlEe8nGzFdBYJ08WjaEW59J5AS6cX9I9h0UXcXJU+Q0j\n" +
+                "Qc4aMHORq/c5ke5uJRwnNZ29CfnuIJKJLkNMjsqOq3eX0QCtSf0W5qOImn0y9MpZ\n" +
+                "Ws+iG1pA393dN1wxtoEZPh7l3WBwVCtWT1H8M1puFO/MdfHBgpIyYnQ4WyxQDqbL\n" +
+                "9SLIet9grmnFCQ==\n" +
+                "=FNpW\n" +
+                "-----END PGP MESSAGE-----\n";
+        var output = ByteArrayOutputStream();
+        val decrypted = pgp.decrypt("-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
+                "Version: OpenPGP.js v4.5.5\n" +
+                "Comment: https://openpgpjs.org\n" +
+                "\n" +
+                "xcMGBF7VI7oBCACXSplTP+Wad3JMoi5NfImZV6Kf/67Zb/bNxyeMLsKMpbrK\n" +
+                "KvjNTj8jlVepa6axjOloEQ7uftlq2/GtaarDhEuxvEP8czJF5KFxBwv7dpkp\n" +
+                "IA9HvPzB5/H5SM5BO7aM+5jD6JumqHLSLMuZOdxjN3SeVlAgVpjcu5nQmJjC\n" +
+                "L2wRZBqZfQTUldei5LzsHee87DboVsqruFpSeJ+oH4sv8g6//WjrCAEBVG1w\n" +
+                "Tk1R5FrtZ/B/745/sHhTOYDR6wDc0lWytb713BkOTq2mBsWPJvAxTc/PiWwi\n" +
+                "OCnV48MIvu9EAB6hCjDPkue1V5rPux4l4zA4d5YcFx8UQ66XjQUqn/5lABEB\n" +
+                "AAH+CQMCytDQ/+YDtfNg4xNQwHPsLsJhwaKmZ1rtfvmoImyvcfxCdJvVzsMf\n" +
+                "zYlZ/jAKtg1LPneY1yJVOBWxHiDcNfjqXveOSyvxDlz24uegEwrRbALyQNOm\n" +
+                "42XdkYIzdpzngYQcHlgd5sf1As5PcDefC3oUhyLd5BQmDZpeHyVIUCbT5rQZ\n" +
+                "BEO4IOytqBUg1/rSGInonmXBeuYLvL6qHufql7shLkEcDnfkuVgV3ZHfju9R\n" +
+                "t2esTCMvvgINC9mZ2f4UgIdlzrTJhX9ssrFLIUyljx2fyKKy8bSxiRxDcLm9\n" +
+                "q1aj+bdBF7Qfmso5lBIjCX7RWjGV4qWRp9aOfhymPZtFwMzUgOIrxvMrghxB\n" +
+                "KI1bsVjk8io8qX14Ma2sJDjc6pflOr1cydB8g1/06scnQtTFJKcFiCyrL0ie\n" +
+                "nLz/d58QU88MCJdgISMBzuZl6Q/tEadsJXubPwrKPjWl5zbEFSH1oUwK6Gx7\n" +
+                "mCCK9Ttsy9T3jj/DM+QYM1zlG7zXEc3C7sCpicYP6mvqU+EgqKpztBnWWeOf\n" +
+                "zuojCKlZrd7IgE5XZhlaj6FZJVu49/ONYPZXgegGGOo90xwBINehBsupdLYB\n" +
+                "lpCvthIolnQt2MY3gBuG2/wACDAJcDhRSDhjiLNUThqvsl9DmIAfMHV93Woq\n" +
+                "X5nWqP4u7aod2RQ0bE3tmC5eapnJ7smAwQn+IXBmNarq6YfhILV2FRoCNg/W\n" +
+                "5yTaSEH/FcojPum/6ganV/NWtrTI/qxxTq43aQbomUVbV9DqssLXERWUJNlZ\n" +
+                "VP6z16cgZjI5AvpDl66xJFGKdF2EUmNfvZ5asQWANuQJL/9LcrxQtQ5Ettuh\n" +
+                "8lTQFwHNCfdWoZbDb5vHuXlQdlvMOG3MXM6pd65/LWHh/VsQUsyV6S9SH1KZ\n" +
+                "Kt8AsExf8+b1slUGym9WtTr6AQ9sz6MczRluLnlha292bGV2QGFmdGVybG9n\n" +
+                "aWMuY29twsBzBBMBCgAdBQJe1SO6AhsvBRYCAwEABAsJCAcFFQoJCAsCHgEA\n" +
+                "CgkQx0dVAPBBDws6swf9HEeCT2fa/L/OjBJgLjbwugPFGVIbtQBYmvp7o2Zi\n" +
+                "gFMK6pV1CHEuJXBzHSNiZlBCI2RMqlCmAQNyFUpfhG1P/320xoLUVVpDPKyU\n" +
+                "vNu+W6K9JmcdxExk65LH1jJ3KApf7Dca00teLQ8T91sV1zDITa5CynV7c4t8\n" +
+                "uamfR/GhYtU5akj6xIlQC1GcQkfgmbdI+J3hnpiQGIyeVBCch3VBDSuBxLyj\n" +
+                "mG1k9JaaYd4Fq+tVGJRx+7eHsiHTuCa/Lb622zqdxviq4+uHDy5xMkPe5hgv\n" +
+                "jIfR0daM02yM1HxcM+3OOroN5yAV2uD4BUHDZN7Nc6GmgURNP9V+/WecS9vf\n" +
+                "3Q==\n" +
+                "=vtK2\n" +
+                "-----END PGP PRIVATE KEY BLOCK-----", arrayOf(), "111", ByteArrayInputStream(input.toByteArray()), output)
+        output
     }
 
     private fun symmetrically(message: String, password: String, decryptPassword: String): TestResult {

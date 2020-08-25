@@ -39,14 +39,26 @@ public class PgpUtilApi {
             InputStream inputStream = (new ByteArrayInputStream(text.getBytes()));
             boolean isPrivate;
             PGPPublicKey key;
+            String armoredKey;
             try {
                 key = KeyRingReader.readPublicKeyRing(PGPUtil.getDecoderStream(inputStream)).getPublicKey();
                 isPrivate = false;
+                ByteArrayOutputStream publicOut = new ByteArrayOutputStream();
+                ArmoredOutputStream armoredPublicOut = new ArmoredOutputStream(publicOut);
+                armoredPublicOut.write(key.getEncoded());
+                armoredPublicOut.close();
+
+                armoredKey = new String(publicOut.toByteArray());
 
             } catch (Throwable e) {
                 inputStream.reset();
                 key = KeyRingReader.readSecretKeyRing(PGPUtil.getDecoderStream(inputStream)).getPublicKey();
                 isPrivate = true;
+                ByteArrayOutputStream secretOut = new ByteArrayOutputStream();
+                ArmoredOutputStream armoredPublicOut = new ArmoredOutputStream(secretOut);
+                armoredPublicOut.write(key.getEncoded());
+                armoredPublicOut.close();
+                armoredKey = new String(secretOut.toByteArray());
             }
             ArrayList<String> users = new ArrayList<String>();
             Iterator<String> iterator = key.getUserIDs();
@@ -54,7 +66,7 @@ public class PgpUtilApi {
                 users.add(iterator.next());
 
 
-            return new KeyDescription(isPrivate, users, key.getBitStrength());
+            return new KeyDescription(isPrivate, users, key.getBitStrength(),armoredKey);
         } catch (Throwable e) {
             if (e instanceof PgpError) {
                 throw (PgpError) e;

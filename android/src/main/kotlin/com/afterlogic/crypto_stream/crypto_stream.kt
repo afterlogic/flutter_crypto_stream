@@ -209,7 +209,7 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
                         val result = pgpUtilApi.getKeyDescription(key)
 
-                        return arrayListOf(result.length, result.emails, result.isPrivate)
+                        return arrayListOf(result.length, result.emails, result.isPrivate, result.armoredKey)
                     }
                     "createKeys" -> {
                         val length = (arg.next() as Number).toInt()
