@@ -22,7 +22,10 @@
 
 - (instancetype __nonnull)initWithBoolean:(jboolean)isPrivate
                     withJavaUtilArrayList:(JavaUtilArrayList *)emails
-                                  withInt:(jint)length;
+                                  withInt:(jint)length
+                             withNSString:(NSString *)armoredKey;
+
+- (NSString *)getArmoredKey;
 
 - (JavaUtilArrayList *)getEmails;
 
@@ -38,11 +41,11 @@
 
 J2OBJC_EMPTY_STATIC_INIT(LibComAfterlogicPgpKeyDescription)
 
-FOUNDATION_EXPORT void LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(LibComAfterlogicPgpKeyDescription *self, jboolean isPrivate, JavaUtilArrayList *emails, jint length);
+FOUNDATION_EXPORT void LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(LibComAfterlogicPgpKeyDescription *self, jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey);
 
-FOUNDATION_EXPORT LibComAfterlogicPgpKeyDescription *new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(jboolean isPrivate, JavaUtilArrayList *emails, jint length) NS_RETURNS_RETAINED;
+FOUNDATION_EXPORT LibComAfterlogicPgpKeyDescription *new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey) NS_RETURNS_RETAINED;
 
-FOUNDATION_EXPORT LibComAfterlogicPgpKeyDescription *create_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(jboolean isPrivate, JavaUtilArrayList *emails, jint length);
+FOUNDATION_EXPORT LibComAfterlogicPgpKeyDescription *create_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey);
 
 J2OBJC_TYPE_LITERAL_HEADER(LibComAfterlogicPgpKeyDescription)
 
