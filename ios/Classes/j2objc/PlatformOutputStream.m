@@ -14,6 +14,7 @@
  @public
   LibComAfterlogicPgpPlatform_streamStreamSink *sink_;
   IOSByteArray *buffer_;
+  jboolean isClosed_;
   jint position_;
 }
 
@@ -58,8 +59,11 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
 }
 
 - (void)close {
-  LibComAfterlogicPgpPlatform_streamPlatformOutputStream_sendBuffer(self);
-  [super close];
+  if (!isClosed_) {
+    isClosed_ = true;
+    LibComAfterlogicPgpPlatform_streamPlatformOutputStream_sendBuffer(self);
+    [super close];
+  }
 }
 
 - (void)sendBuffer {
@@ -87,10 +91,11 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
     { "sink_", "LLibComAfterlogicPgpPlatform_streamStreamSink;", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
     { "BUFFER_SIZE", "I", .constantValue.asInt = LibComAfterlogicPgpPlatform_streamPlatformOutputStream_BUFFER_SIZE, 0x1a, -1, -1, -1, -1 },
     { "buffer_", "[B", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
+    { "isClosed_", "Z", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
     { "position_", "I", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
   };
   static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamSink;", "write", "[BII", "LJavaIoIOException;", "I" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformOutputStream = { "PlatformOutputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 5, 4, -1, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformOutputStream = { "PlatformOutputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 5, 5, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPlatform_streamPlatformOutputStream;
 }
 
@@ -99,6 +104,7 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformOu
 void LibComAfterlogicPgpPlatform_streamPlatformOutputStream_initWithLibComAfterlogicPgpPlatform_streamStreamSink_(LibComAfterlogicPgpPlatform_streamPlatformOutputStream *self, LibComAfterlogicPgpPlatform_streamStreamSink *sink) {
   JavaIoOutputStream_init(self);
   self->buffer_ = [IOSByteArray newArrayWithLength:LibComAfterlogicPgpPlatform_streamPlatformOutputStream_BUFFER_SIZE];
+  self->isClosed_ = false;
   self->position_ = 0;
   self->sink_ = sink;
 }

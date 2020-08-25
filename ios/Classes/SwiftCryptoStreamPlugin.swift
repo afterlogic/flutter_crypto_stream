@@ -185,7 +185,7 @@ public class SwiftCryptoStreamPlugin: NSObject, FlutterPlugin,FlutterStreamHandl
                     emails.append(emailsIterator?.next() as? String)
                 }
                 let isPrivate = result.isPrivate()
-                return [length,emails,isPrivate]
+                return [length,emails,isPrivate,result.getArmoredKey()]
                 
             case "createKeys":
                 let length = arg.next() as! NSNumber

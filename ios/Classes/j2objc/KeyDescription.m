@@ -12,11 +12,13 @@
   jboolean isPrivate_;
   JavaUtilArrayList *emails_;
   jint length_;
+  NSString *armoredKey_;
 }
 
 @end
 
 J2OBJC_FIELD_SETTER(LibComAfterlogicPgpKeyDescription, emails_, JavaUtilArrayList *)
+J2OBJC_FIELD_SETTER(LibComAfterlogicPgpKeyDescription, armoredKey_, NSString *)
 
 @implementation LibComAfterlogicPgpKeyDescription
 
@@ -34,9 +36,14 @@ J2OBJC_FIELD_SETTER(LibComAfterlogicPgpKeyDescription, emails_, JavaUtilArrayLis
 
 - (instancetype)initWithBoolean:(jboolean)isPrivate
           withJavaUtilArrayList:(JavaUtilArrayList *)emails
-                        withInt:(jint)length {
-  LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(self, isPrivate, emails, length);
+                        withInt:(jint)length
+                   withNSString:(NSString *)armoredKey {
+  LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(self, isPrivate, emails, length, armoredKey);
   return self;
+}
+
+- (NSString *)getArmoredKey {
+  return armoredKey_;
 }
 
 + (const J2ObjcClassInfo *)__metadata {
@@ -45,6 +52,7 @@ J2OBJC_FIELD_SETTER(LibComAfterlogicPgpKeyDescription, emails_, JavaUtilArrayLis
     { NULL, "LJavaUtilArrayList;", 0x1, -1, -1, -1, 0, -1, -1 },
     { NULL, "Z", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, NULL, 0x1, -1, 1, -1, 2, -1, -1 },
+    { NULL, "LNSString;", 0x1, -1, -1, -1, -1, -1, -1 },
   };
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
@@ -52,33 +60,36 @@ J2OBJC_FIELD_SETTER(LibComAfterlogicPgpKeyDescription, emails_, JavaUtilArrayLis
   methods[0].selector = @selector(getLength);
   methods[1].selector = @selector(getEmails);
   methods[2].selector = @selector(isPrivate);
-  methods[3].selector = @selector(initWithBoolean:withJavaUtilArrayList:withInt:);
+  methods[3].selector = @selector(initWithBoolean:withJavaUtilArrayList:withInt:withNSString:);
+  methods[4].selector = @selector(getArmoredKey);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "isPrivate_", "Z", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
     { "emails_", "LJavaUtilArrayList;", .constantValue.asLong = 0, 0x12, -1, -1, 3, -1 },
     { "length_", "I", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
+    { "armoredKey_", "LNSString;", .constantValue.asLong = 0, 0x12, -1, -1, -1, -1 },
   };
-  static const void *ptrTable[] = { "()Ljava/util/ArrayList<Ljava/lang/String;>;", "ZLJavaUtilArrayList;I", "(ZLjava/util/ArrayList<Ljava/lang/String;>;I)V", "Ljava/util/ArrayList<Ljava/lang/String;>;" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpKeyDescription = { "KeyDescription", "lib.com.afterlogic.pgp", ptrTable, methods, fields, 7, 0x1, 4, 3, -1, -1, -1, -1, -1 };
+  static const void *ptrTable[] = { "()Ljava/util/ArrayList<Ljava/lang/String;>;", "ZLJavaUtilArrayList;ILNSString;", "(ZLjava/util/ArrayList<Ljava/lang/String;>;ILjava/lang/String;)V", "Ljava/util/ArrayList<Ljava/lang/String;>;" };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpKeyDescription = { "KeyDescription", "lib.com.afterlogic.pgp", ptrTable, methods, fields, 7, 0x1, 5, 4, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpKeyDescription;
 }
 
 @end
 
-void LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(LibComAfterlogicPgpKeyDescription *self, jboolean isPrivate, JavaUtilArrayList *emails, jint length) {
+void LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(LibComAfterlogicPgpKeyDescription *self, jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey) {
   NSObject_init(self);
   self->isPrivate_ = isPrivate;
   self->emails_ = emails;
   self->length_ = length;
+  self->armoredKey_ = armoredKey;
 }
 
-LibComAfterlogicPgpKeyDescription *new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(jboolean isPrivate, JavaUtilArrayList *emails, jint length) {
-  J2OBJC_NEW_IMPL(LibComAfterlogicPgpKeyDescription, initWithBoolean_withJavaUtilArrayList_withInt_, isPrivate, emails, length)
+LibComAfterlogicPgpKeyDescription *new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey) {
+  J2OBJC_NEW_IMPL(LibComAfterlogicPgpKeyDescription, initWithBoolean_withJavaUtilArrayList_withInt_withNSString_, isPrivate, emails, length, armoredKey)
 }
 
-LibComAfterlogicPgpKeyDescription *create_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(jboolean isPrivate, JavaUtilArrayList *emails, jint length) {
-  J2OBJC_CREATE_IMPL(LibComAfterlogicPgpKeyDescription, initWithBoolean_withJavaUtilArrayList_withInt_, isPrivate, emails, length)
+LibComAfterlogicPgpKeyDescription *create_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(jboolean isPrivate, JavaUtilArrayList *emails, jint length, NSString *armoredKey) {
+  J2OBJC_CREATE_IMPL(LibComAfterlogicPgpKeyDescription, initWithBoolean_withJavaUtilArrayList_withInt_withNSString_, isPrivate, emails, length, armoredKey)
 }
 
 J2OBJC_CLASS_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpKeyDescription)

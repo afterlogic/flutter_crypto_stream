@@ -78,19 +78,30 @@ J2OBJC_IGNORE_DESIGNATED_END
     JavaIoInputStream *inputStream = (new_JavaIoByteArrayInputStream_initWithByteArray_([((NSString *) nil_chk(text)) java_getBytes]));
     jboolean isPrivate;
     LibOrgBouncycastleOpenpgpPGPPublicKey *key;
+    NSString *armoredKey;
     @try {
       key = [((LibOrgBouncycastleOpenpgpPGPPublicKeyRing *) nil_chk(LibComAfterlogicPgpKeyParsingKeyRingReader_readPublicKeyRingWithJavaIoInputStream_(LibOrgBouncycastleOpenpgpPGPUtil_getDecoderStreamWithJavaIoInputStream_(inputStream)))) getPublicKey];
       isPrivate = false;
+      JavaIoByteArrayOutputStream *publicOut = new_JavaIoByteArrayOutputStream_init();
+      LibOrgBouncycastleBcpgArmoredOutputStream *armoredPublicOut = new_LibOrgBouncycastleBcpgArmoredOutputStream_initWithJavaIoOutputStream_(publicOut);
+      [armoredPublicOut writeWithByteArray:[((LibOrgBouncycastleOpenpgpPGPPublicKey *) nil_chk(key)) getEncoded]];
+      [armoredPublicOut close];
+      armoredKey = [NSString java_stringWithBytes:[publicOut toByteArray]];
     }
     @catch (JavaLangThrowable *e) {
       [inputStream reset];
       key = [((LibOrgBouncycastleOpenpgpPGPSecretKeyRing *) nil_chk(LibComAfterlogicPgpKeyParsingKeyRingReader_readSecretKeyRingWithJavaIoInputStream_(LibOrgBouncycastleOpenpgpPGPUtil_getDecoderStreamWithJavaIoInputStream_(inputStream)))) getPublicKey];
       isPrivate = true;
+      JavaIoByteArrayOutputStream *secretOut = new_JavaIoByteArrayOutputStream_init();
+      LibOrgBouncycastleBcpgArmoredOutputStream *armoredPublicOut = new_LibOrgBouncycastleBcpgArmoredOutputStream_initWithJavaIoOutputStream_(secretOut);
+      [armoredPublicOut writeWithByteArray:[((LibOrgBouncycastleOpenpgpPGPPublicKey *) nil_chk(key)) getEncoded]];
+      [armoredPublicOut close];
+      armoredKey = [NSString java_stringWithBytes:[secretOut toByteArray]];
     }
     JavaUtilArrayList *users = new_JavaUtilArrayList_init();
     id<JavaUtilIterator> iterator = [((LibOrgBouncycastleOpenpgpPGPPublicKey *) nil_chk(key)) getUserIDs];
     while ([((id<JavaUtilIterator>) nil_chk(iterator)) hasNext]) [users addWithId:[iterator next]];
-    return new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_(isPrivate, users, [key getBitStrength]);
+    return new_LibComAfterlogicPgpKeyDescription_initWithBoolean_withJavaUtilArrayList_withInt_withNSString_(isPrivate, users, [key getBitStrength], armoredKey);
   }
   @catch (JavaLangThrowable *e) {
     if ([e isKindOfClass:[LibComAfterlogicPgpPgpError class]]) {
@@ -195,6 +206,7 @@ LibOrgBouncycastleOpenpgpPGPPrivateKey *LibComAfterlogicPgpPgpUtilApi_getPrivate
     }
   }
   @catch (JavaLangThrowable *e) {
+    [e printStackTrace];
   }
   @throw new_LibComAfterlogicPgpPgpError_initWithLibComAfterlogicPgpPgpErrorCase_(JreLoadEnum(LibComAfterlogicPgpPgpErrorCase, InvalidPassword));
 }

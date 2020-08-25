@@ -13,6 +13,7 @@
 #include "java/lang/System.h"
 #include "java/lang/Throwable.h"
 #include "java/util/concurrent/CountDownLatch.h"
+#include "java/util/concurrent/TimeUnit.h"
 
 @interface LibComAfterlogicPgpPlatform_streamPlatformInputStream () {
  @public
@@ -93,8 +94,10 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   if (countDownLatch_ != nil) {
     [countDownLatch_ countDown];
   }
-  [((LibComAfterlogicPgpPlatform_streamStreamCallback *) nil_chk(endBufferCallback_)) invoke];
-  isClosed_ = true;
+  if (!isClosed_) {
+    [((LibComAfterlogicPgpPlatform_streamStreamCallback *) nil_chk(endBufferCallback_)) invoke];
+    isClosed_ = true;
+  }
 }
 
 + (const J2ObjcClassInfo *)__metadata {
@@ -174,7 +177,7 @@ void LibComAfterlogicPgpPlatform_streamPlatformInputStream_pause(LibComAfterlogi
   self->countDownLatch_ = new_JavaUtilConcurrentCountDownLatch_initWithInt_(1);
   [((LibComAfterlogicPgpPlatform_streamStreamCallback *) nil_chk(self->endBufferCallback_)) invoke];
   @try {
-    [((JavaUtilConcurrentCountDownLatch *) nil_chk(self->countDownLatch_)) await];
+    [((JavaUtilConcurrentCountDownLatch *) nil_chk(self->countDownLatch_)) awaitWithLong:1 withJavaUtilConcurrentTimeUnit:JreLoadEnum(JavaUtilConcurrentTimeUnit, SECONDS)];
   }
   @catch (JavaLangInterruptedException *e) {
     [e printStackTrace];
