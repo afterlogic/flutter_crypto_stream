@@ -67,7 +67,7 @@ class PgpApiTest {
         assert(!description.isPrivate && description.emails[0] == email && description.length - length < 100)
         description = pgpUtilApi.getKeyDescription(keys[1])
         assert(description.isPrivate && description.emails[0] == email && description.length - length < 100)
-        description = pgpUtilApi.getKeyDescription(vasilPublicKey)
+        description = pgpUtilApi.getKeyDescription(privateKey)
         print(description);
     }
 
