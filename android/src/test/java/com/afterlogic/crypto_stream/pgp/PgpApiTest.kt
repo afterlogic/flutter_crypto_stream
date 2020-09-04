@@ -2,14 +2,34 @@ package com.afterlogic.crypto_stream.pgp
 
 import lib.com.afterlogic.pgp.PgpApi
 import lib.com.afterlogic.pgp.PgpUtilApi
+import lib.com.afterlogic.pgp.key.parsing.KeyRingReader
+import lib.org.bouncycastle.jce.provider.BouncyCastleProvider
+import lib.org.bouncycastle.openpgp.PGPUtil
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.Security
 
 class PgpApiTest {
     @Test
+    fun webKey() {
+        try {
+            val pgp = PgpApi();
+
+            val inputStream = ByteArrayInputStream(iosEncrypt.toByteArray())
+            val outputStream = ByteArrayOutputStream()
+            pgp.decrypt(webPrivate, arrayOf(webPublic), password, inputStream, outputStream)
+
+             TestResult(verify = pgp.lastVerifyResult, decrypted = true)
+        } catch (e: Throwable) {
+            TestResult(verify = false, decrypted = false)
+        }
+    }
+
+    @Test
     fun encryptDecrypt() {
+        Security.addProvider(BouncyCastleProvider())
         var result = encryptDecryptMessage("test", privateKey, publicKey, password)
         assert(result.verify && result.decrypted)
 
@@ -79,6 +99,12 @@ class PgpApiTest {
         assert(result.decrypted)
         result = symmetrically("test", "1111", "131")
         assert(!result.decrypted && result.encrypted)
+    }
+
+    @Test
+    fun verifyTest() {
+        val result = PgpUtilApi().checkKeyPassword(pcpgPrivate, "111")
+        print(result);
     }
 
     @Test
@@ -291,37 +317,176 @@ class PgpApiTest {
             "rQZb7RZqR3VRye2bUdDPa2p/uIXPdQ81gpuC5jU2wbVYjqA3Xg+K1zL5xwpAuQ==\n" +
             "=AFlz\n" +
             "-----END PGP SIGNATURE-----"
-    val vasilPublicKey = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+    val pcpgPrivate = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
+            "Version: BCPG v1.61\n" +
+            "\n" +
+            "lQPGBF9E6lABCADDDDr3ETEPFRxWMGuuhsXRr0OyhFfqymPPgbN1rnQnsTGOOwLt\n" +
+            "X6LxtcLZKDnNFYQABPD7UXwa/DFbuWrtEF672u5C5NfmRSB4/sxDNSpSZjHLnkg7\n" +
+            "7pb+Cg+/U/g+rV2FIBvXEmcPwE5inBSYLJjGcnTdw4u2jlMp5/b4i5k2SB8DoFrt\n" +
+            "BF03TfUVIXhcS/ouyRWRVYXAQ/PkywtKIzJPwo1/30g20btR02T1Kis2cj3P/ESp\n" +
+            "n6MuA/ga4FBduzGFalsfUHDSMok8CoT702ObY3peCnb/H5joTop5WaUd6avjphT+\n" +
+            "gCi+p+s+oH2Wzi6OFifyo50xI/TqTA51sWVZABEBAAH+CQMII/NDrt1JAKvgvMFW\n" +
+            "Y8zhQKRepJq5wlBSu5An62Tr/8aPbS/gaP7D8o+FKS/OvIjJyrVFI7v7KSfjszfG\n" +
+            "xjBpT6Au1NIXG8NdGKj4JAHcBp9n5b8NfDuZ9E/lWPtPYAIVzkqBG8SBkUq26GMr\n" +
+            "8UFbxzWAnUJItFFA3N74K093qmfJdGovpFGYeoi1YZvMaMQZcA4OtbhzseucBcuQ\n" +
+            "V4+Q9DCU3KcPFYyVcnX80ohfJ8uEyHcWFZBx0/R61d85JOt1fmXSs6AjK8rU7Zq0\n" +
+            "lSvnuvsvDMk8CbFhP6KSVZjirgiHq2znj1iimGUtP+iZm9IBDmSOpmuuogyygZFW\n" +
+            "W0IYWYePcl4EWCM1SjiYe+0EM4udtNeviunVyeY16XunL1ZQLL+B6ZgEhOtwNOGN\n" +
+            "kedRksAu00YzSO0tY0vm3xrrKZouHQe8/JppKZQPtYHaUvgv0+n0s0keGHE4524z\n" +
+            "HsfRv0cdZ2+mVlghiJK3pbXnmd83ugXuuNQqeIBDWLO5yrO0zaFiCY1wvS8Wc+I5\n" +
+            "Tnnx/WLUu2EhUaDvvjnlq+eNtV58XtQCoTVNpP0sSoxdLTAFP4cYsn5DBFFrhdPG\n" +
+            "IVEK52TFPY6qwhH6vnTrDe7qVM9iHXTlhBfl2VzROOH9VbBVG68UzmVNpQwKX4kk\n" +
+            "j3phw9YIb5bnMuf6/wE1qTLZp+TKK1LKneTrPDDQMLVJFLfG1VwcowOOJzC/prlJ\n" +
+            "2RVqQv7WqtKtIcA2P7dW3EgnRmtM73T9Ih62Kvntmzm67CxDzB3nhNIowpF7BADK\n" +
+            "nYpP04MqpoKC7m0nEIqcxGo+ihptQ8Bw7EnKNSACNFlGtIBSPsa1VE/KJ4i1txAO\n" +
+            "UF4aX8j2tfRIH1WJdRSeD6XAuYeeLNLi8lxwgMRMCIW5cQTl4QJrWvKmA6tsfhr5\n" +
+            "mqthUMMT0M6+tCLRgtC10YHRgjI5NTcgPHRlc3RAYWZ0ZXJsb2dpYy5jb20+iQE1\n" +
+            "BBABCAAfBQJfROpQBgsJBwgDAgQVCAoCAxYCAQIZAQIbAwIeAQAKCRBqqSb/sgJq\n" +
+            "aBWkB/wOTGwnazfz6LyOZIhJ7HNajteQpSIj8S8YK0ZMaN/j1+Je1LX4+HKJpzzF\n" +
+            "4+cTXfz/gexZRP1jPRxCxrk5j0OfJmEdPwa9ffYpfSO5Lh3c8gUCFBHop4tYNfrR\n" +
+            "I4KeI2pcXe4mGoiFKLLby1e9OT1k94W5NZVY1lJagWq8adIoXYqjf9RrkkmjqNqI\n" +
+            "2dBvQqlq13JmjXBKHP/Ai4Lfr9ahqTGSZQL3FYt6udRIOi/yx90FjDtEDon79AP6\n" +
+            "szeNA2PThkkZ7xW1DtZOvXD8/kLIrkG0hm1SwdYty1ON83yLk4XAwh2JLXLqKTk2\n" +
+            "8+3nc8ZmbkBLjl/Im1HZTd3a537anQPGBF9E6lABCADSYYy6ctsOh23hQdxfXX4h\n" +
+            "G1rtTuIep2bLQCDUXO4B2RoAqunRtLO99JTpU3YeqwTSglsLZJgfIoeue3AKAlTm\n" +
+            "nVuAYrxj541SxgR6tv6OxY4FL467lwsC/G7CkJqoWkgCTNaI3v/N+QExePnyHorj\n" +
+            "I8927VXdaV8XLc9EdQKZaB5+qaPuaY4eQWJa8LTPjfOO+8ct5SngsJ/FpuoRo9RO\n" +
+            "EN31pizO0gWnVWZdJgM3V3s5z/Q7r6wsrGq4x89MVROwcGxRVqc//089KBfizxNj\n" +
+            "pVyTOCmHwnfBBxeZQIie/Uv5XjDrViq7i5D+yfdXOqxVEXJqDsrvvUFpx5/9Z50T\n" +
+            "ABEBAAH+CQMI4DFF2JIn/YbgnjldbZo3TSAZkbGMNsOUoPlRf/yWJH3qEURJiEJ1\n" +
+            "/5jPrqTUebZDct3bVPNUakKhk4znTONdTHYzoseWmRdLnoo7NuxSuXHlCRKqkgX7\n" +
+            "viBv7N/loSyfJsVSU/SVRCGJXXhdscWpdHsmaso1G89o1Q66SArMGVhUBD1E/bs2\n" +
+            "phg8Jre+ufKCwOTAv0Q5W9tETESJ56RPvyzGvVxU+A4DYxAdz9oozPZAt1RbfqgU\n" +
+            "3rBqtQdN9Tg+99p8vlqduG4tuBW1Qx5qBtfHwLQX4zDdf5xoeSlr56+mpmS/ArV9\n" +
+            "+YGjR0WxHk4XVcehRruTsb7Gic+beyzzYgbAasyFqOok/z2ofB3lB5P6thgyhvXv\n" +
+            "4uAAjtgVIJLYLyG44ad/c4uYMMCchxqVP9Z7S2SyvXO0gdHr84hitW/pt+zSxCS5\n" +
+            "F5AFK2M4GGy8M/oNGS88n0uuijy9dMdLnmO/0oVweCZBIZwL7aU4BBF/54sTb0Ol\n" +
+            "TaK8nZLaXq3PAv/sPF4p8195emj0PzY3oElTOa25MUTHJsZtqR9qEqXAmGiNzs/Q\n" +
+            "wITH/wbCNICuvjHTsbVrNlfmnwL8efq0lYst4zaW3o2Hk06C3MG1vm8UdFbh4mMq\n" +
+            "gRfuyrRrwGGbORq6WajX5nSo6z9kALQvssPF938G6tAlUCfFswMEs2cfnuSiRFNc\n" +
+            "B93H/+NQ2NcaaeZs4z/afxX0XETXCztCtSmWlQnzUB/KrXMb9kjeALZY5der4ul7\n" +
+            "0DHysF1sW7Y1vDsqLKJ0viD5mD0uVeluq46XfnvITt8lQtyqFIzifMIqsPE1VpG0\n" +
+            "RaLHhj6j6vST+6SXBuApfWxqrcnrQFGo7tD5QDatNRFi6arXBf095PRMh0Nlgo5F\n" +
+            "LBvEwr48NiBnJ9d6Y4mtV81i3gSrqkbQFxqW7i6siQEfBBgBCAAJBQJfROpQAhsM\n" +
+            "AAoJEGqpJv+yAmpokggH/RDR8oV4Yf1AGE40zVS9Z3+BnhQR+rcl0/2LB4oNGRFK\n" +
+            "37r+fcMOpjbsWzU8TReMpgcapXIG55xeTbgAzFWM8Kx8IgGvCG8zZ+KToc9Uospd\n" +
+            "u5Sis03qO9Rppp0tOTDeoXY3F7lbrLU1K9mST4Xf5rsJSPZkmAXQmXMtTFcUGdh/\n" +
+            "vsVVh/I58iaV2q1Yl9Lkf8WKIVGMMqFnlSfvj5Ikd29hVSap3UuV/F0myS7J/odk\n" +
+            "GD1/nd65wxmb3Fnek9vFLq+ZHgLWm27RoHbvkIb1GHbdq3LCZswUasLbcyj/S+X+\n" +
+            "9nzaiwDi/Y5NtLFpPOcsPro4c2iLmWfzvlQs84gwlZU=\n" +
+            "=esLd\n" +
+            "-----END PGP PRIVATE KEY BLOCK-----\n"
+    val webPublic = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: OpenPGP.js v4.5.5\n" +
             "Comment: https://openpgpjs.org\n" +
             "\n" +
-            "xsBNBF3wzYoBCAC10pqXSg4DdK00ztLMARZU/f0eVVCrEQIurgF9J8KMr0Tb\n" +
-            "0RQKf1RJpu81nJZGfQrZAx9Ti3kXUmI+MtG/VTvejWQoOkCju5HVMShXLcpl\n" +
-            "9I4STOlufG9eVlKTaDhBqEw1/XZaz1uHJ8kKeaWlBTExI5zKRGOU95Celm6G\n" +
-            "rKIOKaZZDEwjIdqfamdaBXMBW9yjgFeA3hhSpHNs345GLRE8Hzok2cAt4V4E\n" +
-            "pGSEYWkLQ+ROvgqve2Iaah2YvZIjumnT9H6uH/AScJBXB/OrzqeA74JAUYMc\n" +
-            "PoLKXL5ni+8LGlj7BRMMoLRIhJXb288JMmBfQwoT87pmlOA2alTyRepdABEB\n" +
-            "AAHNJFZhc2lsIFNva29sb3YgPHZhc2lsQGFmdGVybG9naWMuY29tPsLAdQQQ\n" +
-            "AQgAHwUCXfDNigYLCQcIAwIEFQgKAgMWAgECGQECGwMCHgEACgkQ59kGhJPa\n" +
-            "eXD53wf+IrkS57pFFQcMRtWE+mpBppnNA77HyUkNQoibsvrbaE7WkPLI0cJA\n" +
-            "tBWgCSHCAXsYx9qeh7UJ1Eg0GOW3s22R/bWR5j32XTYK1cgLJkvhaBz2xT34\n" +
-            "E33FWk1SHuH+iyMV/V2o5QXNlNNdD+w7TzODQ3rgOEM1T4TnaO3RHDqq7ju7\n" +
-            "0m6pCzc8VCai8vOQjCKOQZ+2Trg8lbzKaIsVk22T2/gl1vOmb/4dV9nKgs8V\n" +
-            "2zUpCHQA6w3lFht5FSpw/bT34HP3GvCaAd8Esj3Ei3Sk8I4Jx5u7xN/SQTbF\n" +
-            "S+aUomcrvnKBohh/ljHBOhEe2a+tFF7qXSnbcdxl1JoZI4Dvgs7ATQRd8M2K\n" +
-            "AQgA3gfzG4CciJGtUKh+VfbDYG+ZJjHcVP8bKaJLVoioW5CRQqCkkd7lspa+\n" +
-            "FlX2N89rRoD7zkn7X9M1jRbr3ImuY/K3Zo4FE/Xrbse/SUzUPgp8yAltP6yo\n" +
-            "B9GHvRSYxGdeex/YAX8TIhcuzuohNkw4oGVDIoj+OOE0RxNQfsSHna0hrdLU\n" +
-            "kgBu2aHA2IOfRqTRTlEfWo2FV8GW2hv1j84/htioRlFRbVQe5E6Ts7+NFpqr\n" +
-            "f5eOXIff3VVN35pMlX/ieqtthEjPe3onVhnVfVVdRmkbPuLD4kxmGOv9dLez\n" +
-            "5OiBLI6mFibs6hxZsWHA2YeVJ+BElmXLEhf0v6KemWJURwARAQABwsBfBBgB\n" +
-            "CAAJBQJd8M2KAhsMAAoJEOfZBoST2nlws+AH/R4GYs+UVwlo9MBYxv+ttkki\n" +
-            "wrUTiHVVshf7eY2iqLthJQk+mdIXPM3I0xQN747PTdAqx9OO/PwqTtgeizce\n" +
-            "SeCi7fOPINh0axvfT4+SeA/2g+jgyl6f+Q4A+coFMeKvfSUsK4tFRxAkz+I0\n" +
-            "dt3vIDIcLmvHg4zq+hwGSvIWtBNdX346Sas1dDVu45EFniN7Ywvxqg7hr9NN\n" +
-            "aFBMLUodx+d7R7NlJj6lBd9NUT67g2LKfsy3Rzfne5EGNvClxgEXwN1B3f2z\n" +
-            "L7fuko5W3+2x36rwZNj4litRSEWW75CingZgwp2ZhE/3418tcErOqtvmJLte\n" +
-            "4oSAAnF7vVrFCP8DDJU=\n" +
-            "=Ytll\n" +
-            "-----END PGP PUBLIC KEY BLOCK-----\n";
+            "xsBNBF9SMKgBCADQJQ1KQOtREJm8r7arOGIzT5in5lgRtJJyQtNxNzqTVDYr\n" +
+            "TIeylKpBB968v7Q4l07jPRmHzqlRzrpuv2SR465nLaGoY5lg9xlwnr0BnZsw\n" +
+            "66APrNN2c98h6mxRC7s4oFF84Il/QFeE+9gtRJmndURuDqY+V3Kc4bSXGAbD\n" +
+            "YXabDxQgyWI6PyCBGnvGh2kegKF3G8uGSn0U/3rfbMq+5tWJfklaOJBuHpz/\n" +
+            "KhCTIqWYJWfk+46SpwKmJpZnBDk4GR2bZlT2hI/SZ6m7f75JiF3s/B7dsqBB\n" +
+            "SFT+ueVwe/R73IUn5EhYJ6oDTH4002e030/fx3Me8/bGRHfjjgIZ8eVZABEB\n" +
+            "AAHNFTx0ZXN0QGFmdGVybG9naWMuY29tPsLAdQQQAQgAHwUCX1IwqAYLCQcI\n" +
+            "AwIEFQgKAgMWAgECGQECGwMCHgEACgkQ2BbWjGaAKfQDtAgAoNGab5eyeAa9\n" +
+            "1r8Uj1s2844CgnURqQea9myzNW1CuDnzsZD2nG0XMAG8xCF6rV1xtgVB/Zfx\n" +
+            "cpSSYKNBR0WqsOtw+CXTR8j/vwNBRvCBbWBqsUjF8PoWYfi0oNyUgbLKn6lD\n" +
+            "n1iQpVraePh2tq8WjffFXDi3mgi6MT77VJHs3Ek1q727zP7Oy0IGre3d6CeR\n" +
+            "SF0BoNvFziah1Wx8t0OPA10zIY4qHSJHRmfWUJe8k++yVHpoaXJIleu1Gj/Q\n" +
+            "QKGNXclJT4hVWt3F7h5W7uzlMgpzd1b37O/bAfO0ry1IG2upuQFQJBZXIvsB\n" +
+            "3vjKUcn3k2W4NZ95L4g2OFW699xm+87ATQRfUjCoAQgAqYa4bmguKUjbUJbB\n" +
+            "p/4yTKGKSX3ivR6kqkTaNfuwlavQTgHPqwOfaE23gwp94veiwPCxkbVnfjn8\n" +
+            "9pPrYJ2DRrMmGr5TnY/tbWfUn1Y/Vwt1ir05EgvsZBdQA3Y5Rnq71gW0f17F\n" +
+            "EtidqMMJDzdRRhXEoI7lznkCh9Yp1nX6aXwqqXCwfX/L+IU6qJNAYExdwVuZ\n" +
+            "Ya7ZwlJug+wUvEHlcyTU43yFZ+ZyknsmjKRzCh0C+/QkJGvhlnN5dM/i90vV\n" +
+            "RIRB7PlU+jau7ptXGjYMvZovRy2Ez7iJygI+dPFsWu7QHkJ/jnTO8C+s4nbB\n" +
+            "4vMLQPk2cZFF8O3RmxiBRpmtCwARAQABwsBfBBgBCAAJBQJfUjCoAhsMAAoJ\n" +
+            "ENgW1oxmgCn0XOYH/2jdrVpH0MyQ7aae/iaN5AM8fZld0AnrwVy0E7X9J1hf\n" +
+            "LzLgwWCIKBGxONR4FX67rAsdPOPadn4TBD9SUJUQtRIax3Bp7a0puqdIFc/J\n" +
+            "8sU+oiJATP2fH5FVxYr3OF4D5+Qhlcu5szOLeRZApEYdmbUIXoBKfw8gOg1S\n" +
+            "+V5y0lcxKFYALFG+TDnHG5qiQ7hpSQSTHS7412ssW2i/sviWnm/cfdOWvmy8\n" +
+            "7+YgaTkKJ5g+jxntWaHmTeqhoFbyMJYoCgwh0vl1GTe/BPvta5iFt50bzSt/\n" +
+            "7f80fydJjyRzw1ohxorVhEaeKQDnjRBEN6F//cN+Ef6EwAZ3f2EBQuWJQ+U=\n" +
+            "=R/5j\n" +
+            "-----END PGP PUBLIC KEY BLOCK-----"
+    val webPrivate = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
+            "Version: OpenPGP.js v4.5.5\n" +
+            "Comment: https://openpgpjs.org\n" +
+            "\n" +
+            "xcMGBF9SMKgBCADQJQ1KQOtREJm8r7arOGIzT5in5lgRtJJyQtNxNzqTVDYr\n" +
+            "TIeylKpBB968v7Q4l07jPRmHzqlRzrpuv2SR465nLaGoY5lg9xlwnr0BnZsw\n" +
+            "66APrNN2c98h6mxRC7s4oFF84Il/QFeE+9gtRJmndURuDqY+V3Kc4bSXGAbD\n" +
+            "YXabDxQgyWI6PyCBGnvGh2kegKF3G8uGSn0U/3rfbMq+5tWJfklaOJBuHpz/\n" +
+            "KhCTIqWYJWfk+46SpwKmJpZnBDk4GR2bZlT2hI/SZ6m7f75JiF3s/B7dsqBB\n" +
+            "SFT+ueVwe/R73IUn5EhYJ6oDTH4002e030/fx3Me8/bGRHfjjgIZ8eVZABEB\n" +
+            "AAH+CQMIWVsujY3oLXbge3cdwDf1C6Z9xlFbCdpKVRQaiUN+y8PFHElCgADD\n" +
+            "9Z+Hj8x1EYJHyov12aqTdJvE9ZgbR0xPnkfYus4qFZE95nrPckAyeZgcpnoa\n" +
+            "WGImmpp5B8WhLiAslG4qvzaDw+aUAXMfBsrIuQO1A7tSilxQA3t1bh2M3z9H\n" +
+            "Lk63mKzxnYR+yBHO3y/n7KEo0SauNGH2S37G3VwofdqFF4W5tjHjtQ2OOGYO\n" +
+            "KPC3m46zUFeVBxjgIe+T497QmuwF0qvhMQ+0iQ7kXWxxgRLnSGGtxfSfpbIH\n" +
+            "QCu83sVgEbNS0HmUY9mmcaKSjp7CZ5sfkBPtlVSzn6MiJyj8v4imFlAyRFQj\n" +
+            "ewtV8ssvLr7ugi3NBa58+N2MI3v61AxJNGvCtZ1d6XRWBX31elWoHSFwYnEf\n" +
+            "bWTjKizPubC6fjBjTYOO6SY8xwni+QIuqlouuEn7hdLKxoiPTjXl8sbFgvdv\n" +
+            "4D71ypf2jWA9tCBbPHIBwxh7VfmXovLXMOnnIZloBy5mof6j6c82dAsPOQ3x\n" +
+            "HBvmOiKyPKCUQ/JPAkHMSy3+h/e4AXpAxB0O3TLI6/G9HQNmPCl+kjWgT+Dj\n" +
+            "O+ZSVhx2YOdnGR8MZqJS5Vwngyky8Ax5Koc4HaEr/KoGDMFROnyT0KTO6lEI\n" +
+            "nbh0npzs1CmfRemzDuzXc0DUkiQFfXdsO0R79Hfaa+JuPqrc+fQbM0NEk3ZI\n" +
+            "YU0cd9bT0yRY7c5+4ThMdMgtm2FN+qmcB8Dtu+tbcG6uLqyF6EDbx/YWSfrV\n" +
+            "RhHFbCw3QFVOr/mUYk+OkOTWxPRKWdM6PI9kvbx3IAQ6xNfXoMzO7Zn5szjy\n" +
+            "09ZQAJgvLWvdk+mmZeD/1Q5WoyD82UGZzOtmms34Y0PGZHPOYAmJZSVAojDY\n" +
+            "n2S44+ba8zhem6G7YaWERbiJT2YrdB/TzRU8dGVzdEBhZnRlcmxvZ2ljLmNv\n" +
+            "bT7CwHUEEAEIAB8FAl9SMKgGCwkHCAMCBBUICgIDFgIBAhkBAhsDAh4BAAoJ\n" +
+            "ENgW1oxmgCn0A7QIAKDRmm+XsngGvda/FI9bNvOOAoJ1EakHmvZsszVtQrg5\n" +
+            "87GQ9pxtFzABvMQheq1dcbYFQf2X8XKUkmCjQUdFqrDrcPgl00fI/78DQUbw\n" +
+            "gW1garFIxfD6FmH4tKDclIGyyp+pQ59YkKVa2nj4dravFo33xVw4t5oIujE+\n" +
+            "+1SR7NxJNau9u8z+zstCBq3t3egnkUhdAaDbxc4modVsfLdDjwNdMyGOKh0i\n" +
+            "R0Zn1lCXvJPvslR6aGlySJXrtRo/0EChjV3JSU+IVVrdxe4eVu7s5TIKc3dW\n" +
+            "9+zv2wHztK8tSBtrqbkBUCQWVyL7Ad74ylHJ95NluDWfeS+INjhVuvfcZvvH\n" +
+            "wwYEX1IwqAEIAKmGuG5oLilI21CWwaf+Mkyhikl94r0epKpE2jX7sJWr0E4B\n" +
+            "z6sDn2hNt4MKfeL3osDwsZG1Z345/PaT62Cdg0azJhq+U52P7W1n1J9WP1cL\n" +
+            "dYq9ORIL7GQXUAN2OUZ6u9YFtH9exRLYnajDCQ83UUYVxKCO5c55AofWKdZ1\n" +
+            "+ml8KqlwsH1/y/iFOqiTQGBMXcFbmWGu2cJSboPsFLxB5XMk1ON8hWfmcpJ7\n" +
+            "JoykcwodAvv0JCRr4ZZzeXTP4vdL1USEQez5VPo2ru6bVxo2DL2aL0cthM+4\n" +
+            "icoCPnTxbFru0B5Cf450zvAvrOJ2weLzC0D5NnGRRfDt0ZsYgUaZrQsAEQEA\n" +
+            "Af4JAwhNpqa5gSX4auBpzsm0Ct6KXUS3YYX5g2L/aDj2BSs2TQhC9kkwCGJN\n" +
+            "ydbMe3kdIdU+3uJI3NX5rLzWGb4sNSgEbXyEGcL4DTznz78f3517i5i4vT4f\n" +
+            "V1wC2sLW37aG57iguwVGEjaM/OnR4ilJ/szBQUrmgV+g36Wdgz7EhLUJXTaX\n" +
+            "Q9XlbpiNTTfNUtdo8oDTNHGGRo1aW5W5FSP+D6g6YzDg0vdq4j2RIExuYf4O\n" +
+            "D1rDzMuqQK463NAp9QKTZUBytxa299hT/Yc7p9atSQIzPvTyWahe4o6OkH41\n" +
+            "vA81GhngDKHCO0ey8tTaVjfymXK+6ZLxiPXZZnZ5y+ZBP6XsY2O/3b7dQFs7\n" +
+            "9uaKpSAfUHeccSLDZPuVDhqgh9v2+duZy6JVaOz30ZS6bdVXsOpw4nkRK/TR\n" +
+            "f5f2DS+xLnWR5+/ZwnnbWFzUW7GiOYIR7s0eaY1BU71aWFzZavJtB8ifNlLG\n" +
+            "egHar1GTNNaJRNv9rD+wvhOArerWu9Cs7C/HsJX2r8vXUpomLAkYjyDktQ+r\n" +
+            "CP1bddiZRqvPiauSSCBi3eZzvnQSFVDi/F7ziniVyar62dM9XMXpeZlRPt1V\n" +
+            "RwLeoZ5jKzyLiSm9KGhfL+J7SHQHJ7nEE8EaChUmgidIldpdJdbRE4Xm9Zhk\n" +
+            "hxHENqCnA+o7R/V8iNPViEla/q/4samk/SsX1WX2lfOKhL6Wg5jKcXAroMhN\n" +
+            "Og52lnoPvbLoo1Tv7C6WYHz6/NGF2kKNhN6jcEPS6qNWniFx4tTycCd3bluF\n" +
+            "e4avLBLX2+uNVsDuXYOaE4Mx1rN5JMdHvAWB/VTxhWM+x0VlMrw9NEdMxsIS\n" +
+            "aV5HnGK5BMKb/UkpO0/IoPMQexbvvio8lyuq/oCJeAkceC38p3kF4zkLUEUR\n" +
+            "cOOPO+dlwyvqmHI1RjHIBUr+q2nMlRDCwF8EGAEIAAkFAl9SMKgCGwwACgkQ\n" +
+            "2BbWjGaAKfRc5gf/aN2tWkfQzJDtpp7+Jo3kAzx9mV3QCevBXLQTtf0nWF8v\n" +
+            "MuDBYIgoEbE41HgVfrusCx0849p2fhMEP1JQlRC1EhrHcGntrSm6p0gVz8ny\n" +
+            "xT6iIkBM/Z8fkVXFivc4XgPn5CGVy7mzM4t5FkCkRh2ZtQhegEp/DyA6DVL5\n" +
+            "XnLSVzEoVgAsUb5MOccbmqJDuGlJBJMdLvjXayxbaL+y+Jaeb9x905a+bLzv\n" +
+            "5iBpOQonmD6PGe1ZoeZN6qGgVvIwligKDCHS+XUZN78E++1rmIW3nRvNK3/t\n" +
+            "/zR/J0mPJHPDWiHGitWERp4pAOeNEEQ3oX/9w34R/oTABnd/YQFC5YlD5Q==\n" +
+            "=RNRj\n" +
+            "-----END PGP PRIVATE KEY BLOCK-----"
+    val iosEncrypt = "-----BEGIN PGP MESSAGE-----\n" +
+            "Version: BCPG v1.61\n" +
+            "\n" +
+            "hQEMA9gW1oxmgCn0AQgAhSfb9V3SVyVk4jFzKzBZAhgW+lDdFkNDCClKZhQg4TxI\n" +
+            "HPnW1jMkcu+zgeLShRNJGKUoTz3lBxO3Xy1p7sH4mdiBE2rrsI8F7msfNLKhOenP\n" +
+            "mUh/O+yq1p3StpuNQnanlQs3kUq11t4eCl3BxekxdjbvOq/NFT69HbpMIQYXw+SS\n" +
+            "hqFbfuq4ZrckT2TxP11zWvr7KTJD4ooSkfsML0tlQtVgwSai0OyInC1OXvw3OPkU\n" +
+            "QVxx8RTv8o5PzNKa/oowY7ub5Y231FwqxHu+WeZES7d2kTQMqY+fK0u4agzYgNnT\n" +
+            "ChInhTCZwHHgKBk5/rvlpFgJk/zYVXjNvxYYVtjd7oUBDANKLTwjkXgsDQEH/jJY\n" +
+            "D3ohQ8uMHJYFcMFeDmG4GrpK5zKyQghAhVUAPoxyXMgS/5fnTmGanj///6fRvgmF\n" +
+            "G2CrCU5HQBIHXocIm5guQdYCvPtUwMMrrII7AXuhu3BTVNe3NXsaEp0cAy/n7qJ7\n" +
+            "mZuFuD3yuMcsdGB/dJSGiYAR5co/h7Yn6hyqcEcJV9elOSKf6DpjFW424f4mp+32\n" +
+            "dF/ayZ7pgzYQuDVwekjdbHrbUpF8nvIjcML0U5U5Vl71rGhZ4VEtDvZ0YA74IUGn\n" +
+            "9YA2Nv6iDqJPvb4TPedXxj8V/XYjxzZ54pZv67V59gxWl3eJGirR1oFMsUfPirzZ\n" +
+            "afrtxxaRLL1ysaZXepHSQQFJoe6+yFhECa8j1XICbzZkWKguuHJptujSDa9FRgid\n" +
+            "GB521EagZhcfldKQw8A1fHODVZ4gGfnZbSNRuLXxd1/3\n" +
+            "=ppH6\n" +
+            "-----END PGP MESSAGE-----"
 }

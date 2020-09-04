@@ -27,7 +27,6 @@ class Pgp extends Crypt {
     Stream<List<int>> stream,
   ) async {
     final sink = platformSink();
-    stream.listen((data) {});
     final future = utf8.decodeStream(stream);
     try {
       await sink.add(utf8.encode(text));
@@ -52,9 +51,7 @@ class Pgp extends Crypt {
         publicKeys,
         password,
       ],
-    ).map((item) {
-      return item as List<int>;
-    });
+    ).map(_byteStream);
   }
 
   Stream<List<int>> decrypt(
@@ -69,9 +66,7 @@ class Pgp extends Crypt {
         publicKeys,
         password,
       ],
-    ).map((item) {
-      return item as List<int>;
-    });
+    ).map(_byteStream);
   }
 
   Stream<List<int>> symmetricallyEncrypt(
@@ -86,9 +81,7 @@ class Pgp extends Crypt {
         password,
         length,
       ],
-    ).map((item) {
-      return item as List<int>;
-    });
+    ).map(_byteStream);
   }
 
   Stream<List<int>> symmetricallyDecrypt(
@@ -99,9 +92,7 @@ class Pgp extends Crypt {
       [
         password,
       ],
-    ).map((item) {
-      return item as List<int>;
-    });
+    ).map(_byteStream);
   }
 
   Future<String> sign(
@@ -173,7 +164,17 @@ class Pgp extends Crypt {
 
     return KeyDescription(list[0], List.from(list[1]), list[2], list[3]);
   }
+
+  List<int> _byteStream(dynamic data) {
+    final result = data as List<int>;
+    if (result.last == _errorChar) {
+      return result.sublist(0, result.length - 1);
+    }
+    return result;
+  }
 }
+
+const _errorChar = 255;
 
 class _PlatformSink extends Sink<List<int>> {
   final Future Function(List<int>) _onAdd;

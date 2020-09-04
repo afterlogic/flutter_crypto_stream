@@ -21,6 +21,7 @@ import lib.com.afterlogic.pgp.platform_stream.PlatformInputStream
 import lib.com.afterlogic.pgp.platform_stream.PlatformOutputStream
 import lib.com.afterlogic.pgp.platform_stream.StreamCallback
 import lib.com.afterlogic.pgp.platform_stream.StreamSink
+import lib.org.bouncycastle.jce.provider.BouncyCastleProvider
 import lib.org.bouncycastle.util.io.Streams
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -39,7 +40,8 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
 
     init {
-        subject
+
+            subject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     it()

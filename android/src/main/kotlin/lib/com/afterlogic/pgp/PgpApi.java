@@ -72,7 +72,6 @@ public class PgpApi {
 
         try {
             EncryptionBuilderInterface.ToRecipients toRecipients = new EncryptionBuilder().onOutputStream(outputStream);
-
             EncryptionBuilderInterface.SignWith signWith = toRecipients.toRecipients(PgpUtilApi.getPublicKeyRing(publicKeys))
                     .usingAlgorithms(
                             SymmetricKeyAlgorithm.AES_256,
