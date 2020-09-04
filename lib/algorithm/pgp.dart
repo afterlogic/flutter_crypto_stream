@@ -30,7 +30,7 @@ class Pgp extends Crypt {
     final future = utf8.decodeStream(stream);
     try {
       await sink.add(utf8.encode(text));
-      await sink.close();
+       sink.close();
 
       return await future;
     } catch (_) {

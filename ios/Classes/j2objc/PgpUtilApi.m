@@ -90,11 +90,12 @@ J2OBJC_IGNORE_DESIGNATED_END
     }
     @catch (JavaLangThrowable *e) {
       [inputStream reset];
-      key = [((LibOrgBouncycastleOpenpgpPGPSecretKeyRing *) nil_chk(LibComAfterlogicPgpKeyParsingKeyRingReader_readSecretKeyRingWithJavaIoInputStream_(LibOrgBouncycastleOpenpgpPGPUtil_getDecoderStreamWithJavaIoInputStream_(inputStream)))) getPublicKey];
+      LibOrgBouncycastleOpenpgpPGPSecretKeyRing *secretKeys = LibComAfterlogicPgpKeyParsingKeyRingReader_readSecretKeyRingWithJavaIoInputStream_(LibOrgBouncycastleOpenpgpPGPUtil_getDecoderStreamWithJavaIoInputStream_(inputStream));
+      key = [((LibOrgBouncycastleOpenpgpPGPSecretKeyRing *) nil_chk(secretKeys)) getPublicKey];
       isPrivate = true;
       JavaIoByteArrayOutputStream *secretOut = new_JavaIoByteArrayOutputStream_init();
       LibOrgBouncycastleBcpgArmoredOutputStream *armoredPublicOut = new_LibOrgBouncycastleBcpgArmoredOutputStream_initWithJavaIoOutputStream_(secretOut);
-      [armoredPublicOut writeWithByteArray:[((LibOrgBouncycastleOpenpgpPGPPublicKey *) nil_chk(key)) getEncoded]];
+      [armoredPublicOut writeWithByteArray:[secretKeys getEncoded]];
       [armoredPublicOut close];
       armoredKey = [NSString java_stringWithBytes:[secretOut toByteArray]];
     }
