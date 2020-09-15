@@ -41,7 +41,7 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
     init {
 
-            subject
+        subject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     it()
@@ -160,7 +160,11 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
         val method = route.last()
 
         println("$algorithm.$method")
-
+        if (algorithm == "pgp" && method == "closeStream") {
+            flutterCallback.close()
+            flutterCallback.result = result
+            return
+        }
         if (algorithm == "pgp" && method == "sendData") {
             flutterCallback.data(arguments[0] as ByteArray)
             flutterCallback.result = result
@@ -268,6 +272,10 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
         fun data(byteArray: ByteArray) {
             inputStream?.addBuffer(byteArray)
+        }
+
+        override fun close() {
+            inputStream?.onClose()
         }
 
         override fun invoke() {

@@ -14,11 +14,15 @@ class Pgp extends Crypt {
     return method("sendData", [Uint8List.fromList(data)]);
   }
 
+  Future _closeStream() {
+    return method("closeStream", []);
+  }
+
   _PlatformSink platformSink() {
     return _PlatformSink((data) {
       return _sendData(data);
     }, () {
-      return _sendData([-1]);
+      return _closeStream();
     });
   }
 
@@ -30,7 +34,7 @@ class Pgp extends Crypt {
     final future = utf8.decodeStream(stream);
     try {
       await sink.add(utf8.encode(text));
-       sink.close();
+      sink.close();
 
       return await future;
     } catch (_) {
@@ -166,11 +170,7 @@ class Pgp extends Crypt {
   }
 
   List<int> _byteStream(dynamic data) {
-    final result = data as List<int>;
-    if (result.last == _errorChar) {
-      return result.sublist(0, result.length - 1);
-    }
-    return result;
+    return data as List<int>;
   }
 }
 

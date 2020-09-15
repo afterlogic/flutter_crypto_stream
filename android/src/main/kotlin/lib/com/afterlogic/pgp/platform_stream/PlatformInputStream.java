@@ -17,11 +17,8 @@ public class PlatformInputStream extends InputStream {
     }
 
     public void addBuffer(byte[] buffer) {
-        this.buffer = buffer;
         position = 0;
-        if (buffer.length == 1 && buffer[0] == -1) {
-            close();
-        }
+        this.buffer = buffer;
         if (countDownLatch != null) {
             countDownLatch.countDown();
         }
@@ -52,6 +49,9 @@ public class PlatformInputStream extends InputStream {
             position += len;
             if (position >= buffer.length) {
                 pause();
+                if (isClosed) {
+                    return outPos;
+                }
             }
         }
         return outPos;
@@ -91,6 +91,15 @@ public class PlatformInputStream extends InputStream {
         if (!isClosed) {
             endBufferCallback.invoke();
             isClosed = true;
+        }
+    }
+
+    public void onClose() {
+        position = 0;
+        this.buffer = new byte[0];
+        close();
+        if (countDownLatch != null) {
+            countDownLatch.countDown();
         }
     }
 }
