@@ -28,6 +28,8 @@
 
 - (void)close;
 
+- (void)onClose;
+
 - (jint)read;
 
 - (jint)readWithByteArray:(IOSByteArray *)b

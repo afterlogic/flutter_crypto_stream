@@ -20,6 +20,8 @@
 
 - (instancetype __nonnull)init;
 
+- (void)close;
+
 - (void)invoke;
 
 @end

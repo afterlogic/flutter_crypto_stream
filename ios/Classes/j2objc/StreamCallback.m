@@ -20,9 +20,15 @@ J2OBJC_IGNORE_DESIGNATED_END
   [self doesNotRecognizeSelector:_cmd];
 }
 
+- (void)close {
+  // can't call an abstract method
+  [self doesNotRecognizeSelector:_cmd];
+}
+
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x1, -1, -1, -1, -1, -1, -1 },
+    { NULL, "V", 0x401, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x401, -1, -1, -1, -1, -1, -1 },
   };
   #pragma clang diagnostic push
@@ -30,8 +36,9 @@ J2OBJC_IGNORE_DESIGNATED_END
   #pragma clang diagnostic ignored "-Wundeclared-selector"
   methods[0].selector = @selector(init);
   methods[1].selector = @selector(invoke);
+  methods[2].selector = @selector(close);
   #pragma clang diagnostic pop
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamStreamCallback = { "StreamCallback", "lib.com.afterlogic.pgp.platform_stream", NULL, methods, NULL, 7, 0x401, 2, 0, -1, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamStreamCallback = { "StreamCallback", "lib.com.afterlogic.pgp.platform_stream", NULL, methods, NULL, 7, 0x401, 3, 0, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPlatform_streamStreamCallback;
 }
 
