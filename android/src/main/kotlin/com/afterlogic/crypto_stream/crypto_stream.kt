@@ -27,6 +27,7 @@ import lib.org.bouncycastle.util.io.Streams
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.Security
 
 class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
@@ -41,7 +42,7 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
 
     init {
-
+        Security.addProvider(BouncyCastleProvider())
         subject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
