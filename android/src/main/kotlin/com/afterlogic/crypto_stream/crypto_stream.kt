@@ -1,6 +1,5 @@
 package com.afterlogic.crypto_stream
 
-import com.afterlogic.crypto_stream.aes.Aes
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -14,6 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.schedulers.SingleScheduler
 import io.reactivex.subjects.BehaviorSubject
+import lib.com.afterlogic.pgp.AesApi
+import lib.com.afterlogic.pgp.AesApi.performCryption
 import lib.com.afterlogic.pgp.PgpApi
 import lib.com.afterlogic.pgp.PgpError
 import lib.com.afterlogic.pgp.PgpUtilApi
@@ -206,7 +207,7 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                 val isLast = arg.next() as Boolean
                 val isDecrypt = method == "decrypt"
 
-                return Aes.performCryption(fileData, rawKey, iv, isLast, isDecrypt)
+                return performCryption(fileData, rawKey, iv, isLast, isDecrypt)
             }
             "pgp" -> {
                 when (method) {

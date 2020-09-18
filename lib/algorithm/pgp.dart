@@ -174,8 +174,6 @@ class Pgp extends Crypt {
   }
 }
 
-const _errorChar = 255;
-
 class _PlatformSink extends Sink<List<int>> {
   final Future Function(List<int>) _onAdd;
   final Future Function() _onClose;
