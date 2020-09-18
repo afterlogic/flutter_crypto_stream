@@ -47,11 +47,8 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
 }
 
 - (void)addBufferWithByteArray:(IOSByteArray *)buffer {
-  self->buffer_ = buffer;
   position_ = 0;
-  if (((IOSByteArray *) nil_chk(buffer))->size_ == 1 && IOSByteArray_Get(buffer, 0) == -1) {
-    [self close];
-  }
+  self->buffer_ = buffer;
   if (countDownLatch_ != nil) {
     [countDownLatch_ countDown];
   }
@@ -100,6 +97,15 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   }
 }
 
+- (void)onClose {
+  position_ = 0;
+  self->buffer_ = [IOSByteArray newArrayWithLength:0];
+  [self close];
+  if (countDownLatch_ != nil) {
+    [countDownLatch_ countDown];
+  }
+}
+
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x1, -1, 0, -1, -1, -1, -1 },
@@ -108,6 +114,7 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
     { NULL, "I", 0x2, 6, 7, -1, -1, -1, -1 },
     { NULL, "I", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x2, -1, -1, -1, -1, -1, -1 },
+    { NULL, "V", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, "V", 0x1, -1, -1, -1, -1, -1, -1 },
   };
   #pragma clang diagnostic push
@@ -120,6 +127,7 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
   methods[4].selector = @selector(read);
   methods[5].selector = @selector(pause);
   methods[6].selector = @selector(close);
+  methods[7].selector = @selector(onClose);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "isClosed_", "Z", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
@@ -129,7 +137,7 @@ __attribute__((unused)) static void LibComAfterlogicPgpPlatform_streamPlatformIn
     { "countDownLatch_", "LJavaUtilConcurrentCountDownLatch;", .constantValue.asLong = 0, 0x2, -1, -1, -1, -1 },
   };
   static const void *ptrTable[] = { "LLibComAfterlogicPgpPlatform_streamStreamCallback;", "addBuffer", "[B", "read", "[BII", "LJavaIoIOException;", "readBuffer", "[BI" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformInputStream = { "PlatformInputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 7, 5, -1, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpPlatform_streamPlatformInputStream = { "PlatformInputStream", "lib.com.afterlogic.pgp.platform_stream", ptrTable, methods, fields, 7, 0x1, 8, 5, -1, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpPlatform_streamPlatformInputStream;
 }
 
@@ -168,6 +176,9 @@ jint LibComAfterlogicPgpPlatform_streamPlatformInputStream_readBufferWithByteArr
     self->position_ += len;
     if (self->position_ >= ((IOSByteArray *) nil_chk(self->buffer_))->size_) {
       LibComAfterlogicPgpPlatform_streamPlatformInputStream_pause(self);
+      if (self->isClosed_) {
+        return outPos;
+      }
     }
   }
   return outPos;

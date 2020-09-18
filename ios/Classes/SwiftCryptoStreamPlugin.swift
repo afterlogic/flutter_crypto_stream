@@ -31,9 +31,14 @@ public class SwiftCryptoStreamPlugin: NSObject, FlutterPlugin,FlutterStreamHandl
             let method = route[1]
             
             print("\(algorithm).\(method)")
-            
             if(algorithm == "pgp" && method == "sendData"){
                 self.flutterCallback.data((arguments[0] as! FlutterStandardTypedData).data)
+                self.flutterCallback.result = result
+                return
+            }
+            
+            if(algorithm == "pgp" && method == "closeStream"){
+                self.flutterCallback.close()
                 self.flutterCallback.result = result
                 return
             }
@@ -245,6 +250,9 @@ class FlutterCallback: LibComAfterlogicPgpPlatform_streamStreamCallback    {
     
     func data(_ data:Data){
         inputStream?.addBuffer(with: IOSByteArray.init(nsData: data))
+    }
+    override func close(){
+        inputStream?.onClose()
     }
     
     override func invoke() {
