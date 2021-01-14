@@ -173,11 +173,17 @@ public class SwiftCryptoStreamPlugin: NSObject, FlutterPlugin,FlutterStreamHandl
         switch algorithm {
         case "aes":
             let fileData = (arg.next() as! FlutterStandardTypedData).data
-            let rawData = (arg.next() as! String).data(using: .utf8)
-            let iv = (arg.next() as! String).data(using: .utf8)
+            let rawData = (arg.next() as! String)
+            let iv = (arg.next() as! String)
             let isLast = arg.next() as! Bool
             let isDecrypt = method == "decrypt"
-            return  Aes.performCryption(fileData, rawData!, iv!, isLast, isDecrypt)
+    
+            return  LibComAfterlogicPgpAesApi.performCryption(
+                with:IOSByteArray.init(nsData: fileData),
+                with:rawData,
+                with:iv,
+                with:JavaLangBoolean.init(boolean:isLast),
+                with:JavaLangBoolean.init(boolean:isDecrypt))?.toNSData()
         case "pgp":
             switch method {
             case "getKeyDescription":
