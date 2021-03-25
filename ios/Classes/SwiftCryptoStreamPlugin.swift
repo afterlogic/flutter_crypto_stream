@@ -164,7 +164,7 @@ public class SwiftCryptoStreamPlugin: NSObject, FlutterPlugin,FlutterStreamHandl
                 } else {
                     events(FlutterError(code: "", message: error.localizedDescription, details: ""))
                 }
-                events(FlutterEndOfEventStream)
+//                 events(FlutterEndOfEventStream)
             }))
     }
     

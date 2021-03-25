@@ -134,7 +134,6 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                         else -> events.error(it.javaClass.toString(), it.message, "")
                     }
 
-                    subject.onNext { events.endOfStream() }
 
                 })
                 .let {
