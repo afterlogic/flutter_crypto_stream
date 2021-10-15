@@ -1,11 +1,12 @@
 package com.afterlogic.crypto_stream
 
+import androidx.annotation.NonNull
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
@@ -13,7 +14,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.schedulers.SingleScheduler
 import io.reactivex.subjects.BehaviorSubject
-import lib.com.afterlogic.pgp.AesApi
 import lib.com.afterlogic.pgp.AesApi.performCryption
 import lib.com.afterlogic.pgp.PgpApi
 import lib.com.afterlogic.pgp.PgpError
@@ -23,13 +23,10 @@ import lib.com.afterlogic.pgp.platform_stream.PlatformOutputStream
 import lib.com.afterlogic.pgp.platform_stream.StreamCallback
 import lib.com.afterlogic.pgp.platform_stream.StreamSink
 import lib.org.bouncycastle.jce.provider.BouncyCastleProvider
-import lib.org.bouncycastle.util.io.Streams
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.security.Security
 
-class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
+class crypto_stream : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
 
     private val executionScheduler: Scheduler = SingleScheduler()
     private val disposable = CompositeDisposable()
@@ -40,24 +37,76 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
     private var input: PlatformInputStream? = null
     private var flutterCallback = FlutterCallback()
 
+    private lateinit var methodChannel: MethodChannel
+    private lateinit var eventChannel: EventChannel
 
     init {
         Security.addProvider(BouncyCastleProvider())
         subject
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    it()
-                }.let {
-                    disposable.add(it)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                it()
+            }.let {
+                disposable.add(it)
+            }
+    }
+
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "crypto_method")
+        methodChannel.setMethodCallHandler(this)
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "crypto_event")
+        eventChannel.setStreamHandler(this)
+    }
+
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        methodChannel.setMethodCallHandler(null)
+        eventChannel.setStreamHandler(null)
+    }
+
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        val arguments = call.arguments as List<*>
+        val route = call.method.split(".")
+        val algorithm = route.first()
+        val method = route.last()
+
+        println("$algorithm.$method")
+        if (algorithm == "pgp" && method == "closeStream") {
+            flutterCallback.close()
+            flutterCallback.result = result
+            return
+        }
+        if (algorithm == "pgp" && method == "sendData") {
+            flutterCallback.data(arguments[0] as ByteArray)
+            flutterCallback.result = result
+            return
+        }
+
+        Single.create<Any> {
+            try {
+                it.onSuccess(methodExecute(algorithm, method, arguments))
+            } catch (e: Throwable) {
+                it.onError(e)
+            }
+        }
+            .subscribeOn(executionScheduler)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                result.success(it)
+            }, {
+                it.printStackTrace()
+                when (it) {
+                    is NotImplemented -> result.notImplemented()
+                    is PgpError -> result.error(it.errorCase.name, "", "")
+                    else -> result.error(it.javaClass.toString(), it.message, "")
                 }
+            }).let {
+                disposable.add(it)
+            }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun onListen(arguments: Any, events: EventChannel.EventSink) {
-
-
         val arg = (arguments as List<*>).iterator()
-
         val route = (arg.next() as String).split(".")
         val algorithm = route.first()
         val method = route.last()
@@ -73,7 +122,13 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                         val publicKeys = arg.next() as List<String>?
                         val password = arg.next() as String?
                         streamExecutor(events) {
-                            pgpApi.encrypt(privateKey, publicKeys?.toTypedArray(), password, input, output)
+                            pgpApi.encrypt(
+                                privateKey,
+                                publicKeys?.toTypedArray(),
+                                password,
+                                input,
+                                output
+                            )
                         }
                     }
                     "decrypt" -> {
@@ -82,7 +137,13 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                         val password = arg.next() as String?
 
                         streamExecutor(events) {
-                            pgpApi.decrypt(privateKey, publicKeys?.toTypedArray(), password, input, output)
+                            pgpApi.decrypt(
+                                privateKey,
+                                publicKeys?.toTypedArray(),
+                                password,
+                                input,
+                                output
+                            )
                         }
                     }
 
@@ -92,7 +153,13 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                         val length = (arg.next() as Number).toLong()
 
                         streamExecutor(events) {
-                            pgpApi.symmetricallyEncrypt(input, output, File(tempFile), length, password)
+                            pgpApi.symmetricallyEncrypt(
+                                input,
+                                output,
+                                File(tempFile),
+                                length,
+                                password
+                            )
                         }
                     }
 
@@ -122,28 +189,26 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
                 stop()
             }
         }
-                .subscribeOn(executionScheduler)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    subject.onNext { events.endOfStream() }
+            .subscribeOn(executionScheduler)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                subject.onNext { events.endOfStream() }
 
-                }, {
-                    it.printStackTrace()
-                    when (it) {
-                        is PgpError -> events.error(it.errorCase.name, "", "")
-                        else -> events.error(it.javaClass.toString(), it.message, "")
-                    }
-
-
-                })
-                .let {
-                    disposable.add(it)
+            }, {
+                it.printStackTrace()
+                when (it) {
+                    is PgpError -> events.error(it.errorCase.name, "", "")
+                    else -> events.error(it.javaClass.toString(), it.message, "")
                 }
+
+
+            })
+            .let {
+                disposable.add(it)
+            }
     }
 
-    override fun onCancel(arguments: Any?) {
-
-    }
+    override fun onCancel(arguments: Any?) {}
 
     private fun stop() {
         output?.close()
@@ -153,48 +218,6 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
         flutterCallback = FlutterCallback()
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
-
-        val arguments = call.arguments as List<*>
-        val route = call.method.split(".")
-        val algorithm = route.first()
-        val method = route.last()
-
-        println("$algorithm.$method")
-        if (algorithm == "pgp" && method == "closeStream") {
-            flutterCallback.close()
-            flutterCallback.result = result
-            return
-        }
-        if (algorithm == "pgp" && method == "sendData") {
-            flutterCallback.data(arguments[0] as ByteArray)
-            flutterCallback.result = result
-            return
-        }
-
-        Single.create<Any> {
-            try {
-                it.onSuccess(methodExecute(algorithm, method, arguments))
-            } catch (e: Throwable) {
-                it.onError(e)
-            }
-        }
-                .subscribeOn(executionScheduler)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    result.success(it)
-                }, {
-                    it.printStackTrace()
-                    when (it) {
-                        is NotImplemented -> result.notImplemented()
-                        is PgpError -> result.error(it.errorCase.name, "", "")
-                        else -> result.error(it.javaClass.toString(), it.message, "")
-                    }
-                }).let {
-                    disposable.add(it)
-                }
-
-    }
 
     @Suppress("UNCHECKED_CAST")
     private fun methodExecute(algorithm: String, method: String, arguments: List<*>): Any {
@@ -216,7 +239,12 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
                         val result = pgpUtilApi.getKeyDescription(key)
 
-                        return arrayListOf(result.length, result.emails, result.isPrivate, result.armoredKey)
+                        return arrayListOf(
+                            result.length,
+                            result.emails,
+                            result.isPrivate,
+                            result.armoredKey
+                        )
                     }
                     "createKeys" -> {
                         val length = (arg.next() as Number).toInt()
@@ -255,17 +283,6 @@ class crypto_stream : MethodCallHandler, EventChannel.StreamHandler {
 
     private class NotImplemented : Throwable()
 
-    companion object {
-        @JvmStatic
-        fun registerWith(registrar: Registrar) {
-            val channel = MethodChannel(registrar.messenger(), "crypto_method")
-            val event = EventChannel(registrar.messenger(), "crypto_event")
-            val plugin = crypto_stream()
-            event.setStreamHandler(plugin)
-            channel.setMethodCallHandler(plugin)
-
-        }
-    }
 
     inner class FlutterCallback : StreamCallback() {
         var inputStream: PlatformInputStream? = null
