@@ -50,6 +50,11 @@ public class EncryptionBuilder implements EncryptionBuilderInterface {
     class ToRecipientsImpl implements ToRecipients {
 
         @Override
+        public WithAlgorithms toRecipients() {
+            return new WithAlgorithmsImpl();
+        }
+
+        @Override
         public WithAlgorithms toRecipients(PGPPublicKey... keys) {
             for (PGPPublicKey k : keys) {
                 if (encryptionKeySelector().accept(null, k)) {

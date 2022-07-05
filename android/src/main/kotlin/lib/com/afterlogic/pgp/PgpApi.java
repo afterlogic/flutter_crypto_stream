@@ -72,12 +72,23 @@ public class PgpApi {
 
         try {
             EncryptionBuilderInterface.ToRecipients toRecipients = new EncryptionBuilder().onOutputStream(outputStream);
-            EncryptionBuilderInterface.SignWith signWith = toRecipients.toRecipients(PgpUtilApi.getPublicKeyRing(publicKeys))
-                    .usingAlgorithms(
-                            SymmetricKeyAlgorithm.AES_256,
-                            HashAlgorithmUtil.SHA512,
-                            CompressionAlgorithm.ZIP
-                    );
+            PGPPublicKeyRingCollection publicKeyRing = PgpUtilApi.getPublicKeyRing(publicKeys);
+            EncryptionBuilderInterface.SignWith signWith;
+            if (publicKeyRing.size() > 0) {
+                signWith = toRecipients.toRecipients(publicKeyRing)
+                        .usingAlgorithms(
+                                SymmetricKeyAlgorithm.AES_256,
+                                HashAlgorithmUtil.SHA512,
+                                CompressionAlgorithm.ZIP
+                        );
+            } else {
+                signWith = toRecipients.toRecipients()
+                        .usingAlgorithms(
+                                SymmetricKeyAlgorithm.AES_256,
+                                HashAlgorithmUtil.SHA512,
+                                CompressionAlgorithm.ZIP
+                        );
+            }
 
             EncryptionBuilderInterface.Armor armor;
             if (privateKey != null && password != null) {
@@ -114,6 +125,7 @@ public class PgpApi {
             inputStream.close();
             outputStream.close();
         } catch (Throwable e) {
+            System.out.println("PgpApi.encrypt error:" + e);
             if (e instanceof PgpError) {
                 throw (PgpError) e;
             } else {

@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import lib.com.afterlogic.pgp.algorithm.HashAlgorithmUtil;
 import lib.com.afterlogic.pgp.algorithm.SymmetricKeyAlgorithm;
@@ -148,7 +149,7 @@ public class PgpUtilApi {
         try {
             int length = publicKeys == null ? 0 : publicKeys.length;
             PGPPublicKeyRing[] publicKeyRings = new PGPPublicKeyRing[length];
-            if (publicKeys != null) {
+            if (length > 0) {
                 int i = 0;
                 for (String publicKey : publicKeys) {
                     publicKeyRings[i] = KeyRingReader.readPublicKeyRing(new ByteArrayInputStream(publicKey.getBytes()));
@@ -157,6 +158,7 @@ public class PgpUtilApi {
             }
             return new PGPPublicKeyRingCollection(Arrays.asList(publicKeyRings));
         } catch (Throwable e) {
+            System.out.println("PgpUtilApi.getPublicKeyRing error:" + e);
             throw new PgpError(PgpErrorCase.InvalidMessage);
         }
     }

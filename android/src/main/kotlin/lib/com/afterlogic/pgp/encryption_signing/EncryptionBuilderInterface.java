@@ -28,6 +28,8 @@ public interface EncryptionBuilderInterface {
 
     interface ToRecipients {
 
+        WithAlgorithms toRecipients();
+
         WithAlgorithms toRecipients(PGPPublicKey... keys);
 
         WithAlgorithms toRecipients(PGPPublicKeyRing... keys);
