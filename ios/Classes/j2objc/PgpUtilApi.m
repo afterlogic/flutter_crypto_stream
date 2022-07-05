@@ -38,7 +38,9 @@
 #include "java/io/ByteArrayInputStream.h"
 #include "java/io/ByteArrayOutputStream.h"
 #include "java/io/InputStream.h"
+#include "java/io/PrintStream.h"
 #include "java/lang/Long.h"
+#include "java/lang/System.h"
 #include "java/lang/Throwable.h"
 #include "java/util/ArrayList.h"
 #include "java/util/Arrays.h"
@@ -217,11 +219,11 @@ LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection *LibComAfterlogicPgpPgpUtilA
   @try {
     jint length = publicKeys == nil ? 0 : publicKeys->size_;
     IOSObjectArray *publicKeyRings = [IOSObjectArray newArrayWithLength:length type:LibOrgBouncycastleOpenpgpPGPPublicKeyRing_class_()];
-    if (publicKeys != nil) {
+    if (length > 0) {
       jint i = 0;
       {
         IOSObjectArray *a__ = publicKeys;
-        NSString * const *b__ = a__->buffer_;
+        NSString * const *b__ = ((IOSObjectArray *) nil_chk(a__))->buffer_;
         NSString * const *e__ = b__ + a__->size_;
         while (b__ < e__) {
           NSString *publicKey = *b__++;
@@ -233,6 +235,7 @@ LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection *LibComAfterlogicPgpPgpUtilA
     return new_LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection_initWithJavaUtilCollection_(JavaUtilArrays_asListWithNSObjectArray_(publicKeyRings));
   }
   @catch (JavaLangThrowable *e) {
+    [((JavaIoPrintStream *) nil_chk(JreLoadStatic(JavaLangSystem, out))) printlnWithNSString:JreStrcat("$@", @"PgpUtilApi.getPublicKeyRing error:", e)];
     @throw new_LibComAfterlogicPgpPgpError_initWithLibComAfterlogicPgpPgpErrorCase_(JreLoadEnum(LibComAfterlogicPgpPgpErrorCase, InvalidMessage));
   }
 }

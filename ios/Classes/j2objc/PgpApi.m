@@ -66,7 +66,9 @@
 #include "java/io/FileOutputStream.h"
 #include "java/io/InputStream.h"
 #include "java/io/OutputStream.h"
+#include "java/io/PrintStream.h"
 #include "java/lang/Long.h"
+#include "java/lang/System.h"
 #include "java/lang/Throwable.h"
 #include "java/security/SecureRandom.h"
 #include "java/util/Date.h"
@@ -187,7 +189,14 @@ J2OBJC_IGNORE_DESIGNATED_END
      withJavaIoOutputStream:(JavaIoOutputStream *)outputStream {
   @try {
     id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients> toRecipients = [new_LibComAfterlogicPgpEncryption_signingEncryptionBuilder_init() onOutputStreamWithJavaIoOutputStream:outputStream];
-    id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_SignWith> signWith = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>) nil_chk(([((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients>) nil_chk(toRecipients)) toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:[IOSObjectArray newArrayWithObjects:(id[]){ LibComAfterlogicPgpPgpUtilApi_getPublicKeyRingWithNSStringArray_(publicKeys) } count:1 type:LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection_class_()]]))) usingAlgorithmsWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256) withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil:JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, SHA512) withLibComAfterlogicPgpAlgorithmCompressionAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmCompressionAlgorithm, ZIP)];
+    LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection *publicKeyRing = LibComAfterlogicPgpPgpUtilApi_getPublicKeyRingWithNSStringArray_(publicKeys);
+    id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_SignWith> signWith;
+    if ([((LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection *) nil_chk(publicKeyRing)) size] > 0) {
+      signWith = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>) nil_chk(([((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients>) nil_chk(toRecipients)) toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:[IOSObjectArray newArrayWithObjects:(id[]){ publicKeyRing } count:1 type:LibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection_class_()]]))) usingAlgorithmsWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256) withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil:JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, SHA512) withLibComAfterlogicPgpAlgorithmCompressionAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmCompressionAlgorithm, ZIP)];
+    }
+    else {
+      signWith = [((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>) nil_chk([((id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients>) nil_chk(toRecipients)) toRecipients])) usingAlgorithmsWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256) withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil:JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, SHA512) withLibComAfterlogicPgpAlgorithmCompressionAlgorithm:JreLoadEnum(LibComAfterlogicPgpAlgorithmCompressionAlgorithm, ZIP)];
+    }
     id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_Armor> armor;
     if (privateKey != nil && password != nil) {
       LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings *setting = new_LibComAfterlogicPgpKeyProtectionKeyRingProtectionSettings_initWithLibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm_withLibComAfterlogicPgpAlgorithmHashAlgorithmUtil_withInt_(JreLoadEnum(LibComAfterlogicPgpAlgorithmSymmetricKeyAlgorithm, AES_256), JreLoadEnum(LibComAfterlogicPgpAlgorithmHashAlgorithmUtil, MD5), 0);
@@ -215,6 +224,7 @@ J2OBJC_IGNORE_DESIGNATED_END
     [((JavaIoOutputStream *) nil_chk(outputStream)) close];
   }
   @catch (JavaLangThrowable *e) {
+    [((JavaIoPrintStream *) nil_chk(JreLoadStatic(JavaLangSystem, out))) printlnWithNSString:JreStrcat("$@", @"PgpApi.encrypt error:", e)];
     if ([e isKindOfClass:[LibComAfterlogicPgpPgpError class]]) {
       @throw (LibComAfterlogicPgpPgpError *) e;
     }

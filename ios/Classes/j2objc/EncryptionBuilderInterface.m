@@ -50,6 +50,7 @@ J2OBJC_INTERFACE_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpEncryption_signingEncryp
 
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
+    { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x401, -1, -1, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x481, 0, 1, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x481, 0, 2, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x481, 0, 3, -1, -1, -1, -1 },
@@ -59,14 +60,15 @@ J2OBJC_INTERFACE_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpEncryption_signingEncryp
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
   #pragma clang diagnostic ignored "-Wundeclared-selector"
-  methods[0].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:);
-  methods[1].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingArray:);
-  methods[2].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:);
-  methods[3].selector = @selector(toRecipientsWithLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy:withLibComAfterlogicPgpUtilMultiMap:);
-  methods[4].selector = @selector(doNotEncrypt);
+  methods[0].selector = @selector(toRecipients);
+  methods[1].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:);
+  methods[2].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingArray:);
+  methods[3].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:);
+  methods[4].selector = @selector(toRecipientsWithLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy:withLibComAfterlogicPgpUtilMultiMap:);
+  methods[5].selector = @selector(doNotEncrypt);
   #pragma clang diagnostic pop
   static const void *ptrTable[] = { "toRecipients", "[LLibOrgBouncycastleOpenpgpPGPPublicKey;", "[LLibOrgBouncycastleOpenpgpPGPPublicKeyRing;", "[LLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection;", "LLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy;LLibComAfterlogicPgpUtilMultiMap;", "<O:Ljava/lang/Object;>(Llib/com/afterlogic/pgp/key/selection/keyring/PublicKeyRingSelectionStrategy<TO;>;Llib/com/afterlogic/pgp/util/MultiMap<TO;Llib/org/bouncycastle/openpgp/PGPPublicKeyRingCollection;>;)Llib/com/afterlogic/pgp/encryption_signing/EncryptionBuilderInterface$WithAlgorithms;", "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface;" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients = { "ToRecipients", "lib.com.afterlogic.pgp.encryption_signing", ptrTable, methods, NULL, 7, 0x609, 5, 0, 6, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients = { "ToRecipients", "lib.com.afterlogic.pgp.encryption_signing", ptrTable, methods, NULL, 7, 0x609, 6, 0, 6, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients;
 }
 

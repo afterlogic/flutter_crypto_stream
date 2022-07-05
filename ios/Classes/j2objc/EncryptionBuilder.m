@@ -171,6 +171,10 @@ J2OBJC_CLASS_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpEncryption_signingEncryption
   return self;
 }
 
+- (id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>)toRecipients {
+  return new_LibComAfterlogicPgpEncryption_signingEncryptionBuilder_WithAlgorithmsImpl_initWithLibComAfterlogicPgpEncryption_signingEncryptionBuilder_(this$0_);
+}
+
 - (id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>)toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:(IOSObjectArray *)keys {
   {
     IOSObjectArray *a__ = keys;
@@ -263,6 +267,7 @@ J2OBJC_CLASS_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpEncryption_signingEncryption
 + (const J2ObjcClassInfo *)__metadata {
   static J2ObjcMethodInfo methods[] = {
     { NULL, NULL, 0x0, -1, -1, -1, -1, -1, -1 },
+    { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x1, -1, -1, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x81, 0, 1, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x81, 0, 2, -1, -1, -1, -1 },
     { NULL, "LLibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms;", 0x81, 0, 3, -1, -1, -1, -1 },
@@ -273,17 +278,18 @@ J2OBJC_CLASS_TYPE_LITERAL_SOURCE(LibComAfterlogicPgpEncryption_signingEncryption
   #pragma clang diagnostic ignored "-Wobjc-multiple-method-names"
   #pragma clang diagnostic ignored "-Wundeclared-selector"
   methods[0].selector = @selector(initWithLibComAfterlogicPgpEncryption_signingEncryptionBuilder:);
-  methods[1].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:);
-  methods[2].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingArray:);
-  methods[3].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:);
-  methods[4].selector = @selector(toRecipientsWithLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy:withLibComAfterlogicPgpUtilMultiMap:);
-  methods[5].selector = @selector(doNotEncrypt);
+  methods[1].selector = @selector(toRecipients);
+  methods[2].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:);
+  methods[3].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingArray:);
+  methods[4].selector = @selector(toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollectionArray:);
+  methods[5].selector = @selector(toRecipientsWithLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy:withLibComAfterlogicPgpUtilMultiMap:);
+  methods[6].selector = @selector(doNotEncrypt);
   #pragma clang diagnostic pop
   static const J2ObjcFieldInfo fields[] = {
     { "this$0_", "LLibComAfterlogicPgpEncryption_signingEncryptionBuilder;", .constantValue.asLong = 0, 0x1012, -1, -1, -1, -1 },
   };
   static const void *ptrTable[] = { "toRecipients", "[LLibOrgBouncycastleOpenpgpPGPPublicKey;", "[LLibOrgBouncycastleOpenpgpPGPPublicKeyRing;", "[LLibOrgBouncycastleOpenpgpPGPPublicKeyRingCollection;", "LLibComAfterlogicPgpKeySelectionKeyringPublicKeyRingSelectionStrategy;LLibComAfterlogicPgpUtilMultiMap;", "<O:Ljava/lang/Object;>(Llib/com/afterlogic/pgp/key/selection/keyring/PublicKeyRingSelectionStrategy<TO;>;Llib/com/afterlogic/pgp/util/MultiMap<TO;Llib/org/bouncycastle/openpgp/PGPPublicKeyRingCollection;>;)Llib/com/afterlogic/pgp/encryption_signing/EncryptionBuilderInterface$WithAlgorithms;", "LLibComAfterlogicPgpEncryption_signingEncryptionBuilder;" };
-  static const J2ObjcClassInfo _LibComAfterlogicPgpEncryption_signingEncryptionBuilder_ToRecipientsImpl = { "ToRecipientsImpl", "lib.com.afterlogic.pgp.encryption_signing", ptrTable, methods, fields, 7, 0x0, 6, 1, 6, -1, -1, -1, -1 };
+  static const J2ObjcClassInfo _LibComAfterlogicPgpEncryption_signingEncryptionBuilder_ToRecipientsImpl = { "ToRecipientsImpl", "lib.com.afterlogic.pgp.encryption_signing", ptrTable, methods, fields, 7, 0x0, 7, 1, 6, -1, -1, -1, -1 };
   return &_LibComAfterlogicPgpEncryption_signingEncryptionBuilder_ToRecipientsImpl;
 }
 

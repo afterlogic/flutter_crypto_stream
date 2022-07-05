@@ -42,6 +42,8 @@ J2OBJC_TYPE_LITERAL_HEADER(LibComAfterlogicPgpEncryption_signingEncryptionBuilde
 
 @protocol LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_ToRecipients < JavaObject >
 
+- (id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>)toRecipients;
+
 - (id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>)toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyArray:(IOSObjectArray *)keys;
 
 - (id<LibComAfterlogicPgpEncryption_signingEncryptionBuilderInterface_WithAlgorithms>)toRecipientsWithLibOrgBouncycastleOpenpgpPGPPublicKeyRingArray:(IOSObjectArray *)keys;
