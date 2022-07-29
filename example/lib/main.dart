@@ -16,15 +16,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: DecryptTextPage(),
@@ -49,13 +40,22 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('PGP test'),
+      ),
       body: Center(
         child: ListView(
           children: <Widget>[
-            TextFormField(
-              controller: textCtrl,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextFormField(
+                controller: textCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Input',
+                ),
+              ),
             ),
+            const Divider(),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -63,11 +63,11 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text("bufferEncrypt"),
                         onPressed: bufferEncrypt,
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text("bufferDecrypt"),
                         onPressed: bufferDecrypt,
                       ),
@@ -76,11 +76,11 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text("encrypt"),
                         onPressed: encrypt,
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text("decrypt"),
                         onPressed: decrypt,
                       ),
@@ -89,11 +89,11 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text("symmetricallyEncrypt"),
                         onPressed: symmetricallyEncrypt,
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text("symmetricallyDecrypt"),
                         onPressed: symmetricallyDecrypt,
                       ),
@@ -102,24 +102,24 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text("sign"),
                         onPressed: sign,
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text("verify"),
                         onPressed: verify,
                       ),
                     ],
                   ),
                   Center(
-                    child: FlatButton(
+                    child: TextButton(
                       child: Text("keyInfo"),
                       onPressed: keyInfo,
                     ),
                   ),
                   Center(
-                    child: FlatButton(
+                    child: TextButton(
                       child: Text("checkKey"),
                       onPressed: checkKey,
                     ),
@@ -127,9 +127,16 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
                 ],
               ),
             ),
-            TextField(
-              controller: outCtrl,
-              maxLines: null,
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: outCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Output',
+                ),
+                maxLines: null,
+              ),
             ),
           ],
         ),
@@ -137,7 +144,7 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     );
   }
 
-  bufferEncrypt() async {
+  Future<void> bufferEncrypt() async {
     outText = await pgp.bufferPlatformSink(
       textCtrl.text,
       pgp.encrypt(null, [publicKey], null),
@@ -145,7 +152,7 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     setState(() {});
   }
 
-  bufferDecrypt() async {
+  Future<void> bufferDecrypt() async {
     outText = await pgp.bufferPlatformSink(
       outText,
       pgp.decrypt(privateKey, null, password),
@@ -153,9 +160,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     setState(() {});
   }
 
-  encrypt() async {
+  Future<void> encrypt() async {
     var currentBytes = utf8.encode(textCtrl.text);
-    var outByte = List<int>();
+    var outByte = <int>[];
     pgp.encrypt(null, [publicKey], password).listen((data) {
       outByte.addAll(data);
     }, onError: (e, s) {
@@ -171,8 +178,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -180,9 +188,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     await platformSink.close();
   }
 
-  decrypt() async {
+  Future<void> decrypt() async {
     var currentBytes = utf8.encode(outText);
-    var outByte = List<int>();
+    var outByte = <int>[];
     pgp.decrypt(privateKey, null, password).listen((data) {
       outByte.addAll(data);
     }, onError: (e, s) {
@@ -198,8 +206,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -207,7 +216,7 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     await platformSink.close();
   }
 
-  symmetricallyEncrypt() async {
+  Future<void> symmetricallyEncrypt() async {
     Directory tempDir = await getTemporaryDirectory();
     File tempFile = File(tempDir.path + Platform.pathSeparator + "temp.temp");
     if (await tempFile.exists()) {
@@ -215,8 +224,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     }
 
     var currentBytes = utf8.encode(textCtrl.text);
-    var outByte = List<int>();
-    pgp.symmetricallyEncrypt(tempFile, password, currentBytes.length).listen((data) {
+    var outByte = <int>[];
+    pgp.symmetricallyEncrypt(tempFile, password, currentBytes.length).listen(
+        (data) {
       outByte.addAll(data);
     }, onError: (e, s) {
       print(s);
@@ -233,8 +243,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -242,9 +253,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     await platformSink.close();
   }
 
-  symmetricallyDecrypt() async {
+  Future<void> symmetricallyDecrypt() async {
     var currentBytes = utf8.encode(outText);
-    var outByte = List<int>();
+    var outByte = <int>[];
     pgp.symmetricallyDecrypt(password).listen((data) {
       outByte.addAll(data);
     }, onError: (e, s) {
@@ -262,8 +273,9 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     var count = currentBytes.length / step;
     try {
       for (int i = 0; i < count; i++) {
-        await platformSink.add(
-            currentBytes.getRange(i * step, min((i + 1) * step, currentBytes.length)).toList());
+        await platformSink.add(currentBytes
+            .getRange(i * step, min((i + 1) * step, currentBytes.length))
+            .toList());
       }
     } catch (e, s) {
       print(s);
@@ -271,26 +283,26 @@ class _DecryptTextPageState extends State<DecryptTextPage> {
     await platformSink.close();
   }
 
-  sign() async {
+  Future<void> sign() async {
     var text = textCtrl.text;
     outText = await pgp.sign(text, privateKey, password);
     setState(() {});
   }
 
-  verify() async {
-    var text = outText;
+  Future<void> verify() async {
+    final String text = outCtrl.text;
     outText = await pgp.verify(text, publicKey);
     setState(() {});
   }
 
-  keyInfo() async {
+  Future<void> keyInfo() async {
     outText = "";
     final success = await pgp.checkKeyPassword(privateKey, password);
     outText += "checkKeyPassword = $success";
     setState(() {});
   }
 
-  checkKey() async {
+  Future<void> checkKey() async {
     outText = "";
     final pair = await pgp.createKeys(2000, email, password);
 
@@ -377,6 +389,7 @@ XnLSVzEoVgAsUb5MOccbmqJDuGlJBJMdLvjXayxbaL+y+Jaeb9x905a+bLzv
 =RNRj
 -----END PGP PRIVATE KEY BLOCK-----
 """;
+
 final publicKey = """
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.5.5

@@ -44,9 +44,9 @@ class Pgp extends Crypt {
   }
 
   Stream<List<int>> encrypt(
-    String privateKey,
+    String? privateKey,
     List<String> publicKeys,
-    String password,
+    String? password,
   ) {
     return event(
       "encrypt",
@@ -60,7 +60,7 @@ class Pgp extends Crypt {
 
   Stream<List<int>> decrypt(
     String privateKey,
-    List<String> publicKeys,
+    List<String>? publicKeys,
     String password,
   ) {
     return event(
