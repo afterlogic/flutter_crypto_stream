@@ -4,20 +4,17 @@ PODS:
     - OpenSSL-Universal (~> 1.0.2.17)
     - RxSwift (~> 5)
   - Flutter (1.0.0)
-  - OpenSSL-Universal (1.0.2.19):
-    - OpenSSL-Universal/Static (= 1.0.2.19)
-  - OpenSSL-Universal/Static (1.0.2.19)
-  - path_provider (0.0.1):
+  - OpenSSL-Universal (1.0.2.20):
+    - OpenSSL-Universal/Static (= 1.0.2.20)
+  - OpenSSL-Universal/Static (1.0.2.20)
+  - path_provider_ios (0.0.1):
     - Flutter
-  - path_provider_macos (0.0.1):
-    - Flutter
-  - RxSwift (5.0.1)
+  - RxSwift (5.1.3)
 
 DEPENDENCIES:
   - crypto_stream (from `.symlinks/plugins/crypto_stream/ios`)
   - Flutter (from `Flutter`)
-  - path_provider (from `.symlinks/plugins/path_provider/ios`)
-  - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -29,19 +26,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/crypto_stream/ios"
   Flutter:
     :path: Flutter
-  path_provider:
-    :path: ".symlinks/plugins/path_provider/ios"
-  path_provider_macos:
-    :path: ".symlinks/plugins/path_provider_macos/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
 
 SPEC CHECKSUMS:
   crypto_stream: 2a2fdbfdec937d8779e8e6b14afb3a5e093a61e4
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
-  path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
-  path_provider_macos: f760a3c5b04357c380e2fddb6f9db6f3015897e0
-  RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  RxSwift: 915abbdfb62214aa89ccd0b194d44fb478019b27
 
-PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.11.2
